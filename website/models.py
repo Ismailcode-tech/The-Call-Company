@@ -60,6 +60,7 @@ class Plan(db.Model):
     monthly_price = db.Column(db.Numeric(6, 2), nullable=False)
 
     #specifying the relationship (one to many: one plan can have many memberships)
+    
     memberships = db.relationship('Membership', backref='plan', lazy=True)
 
     def __repr__(self):
@@ -88,20 +89,3 @@ class Membership(db.Model):
     
 
 
-"""
-Important consideration:
-
-In order to allow the creation of the tables in the database, in the __init__.py file, you should add the following:
-
-    from . import models             this was missing
-
-    create_database(app)             this was missing as well
-
-    return app
-
-def create_database(app):           this ensures that the database is created
-    with app.app_context():
-        db.create_all()
-        print('Created Database!')
-
-"""
