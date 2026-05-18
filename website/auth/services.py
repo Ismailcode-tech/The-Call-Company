@@ -5,6 +5,7 @@ from datetime import date
 from sqlalchemy.exc import SQLAlchemyError
 from . import db
 from ..models import Member
+from . import send_registration_email
 
 
 login_schema = {
@@ -126,7 +127,7 @@ def register_user(data):
             (today.month, today.day) < (born.month, born.day)
         )
 
-        new_user = Member(
+        new_member = Member(
             email=email,
             fname=data.get('fname'),
             lname=data.get('lname'),
@@ -135,9 +136,9 @@ def register_user(data):
             age=age
         )
 
-        new_user.set_password(data.get('password'))
+        new_member.set_password(data.get('password'))
 
-        db.session.add(new_user)
+        db.session.add(new_member)
         db.session.commit()
 
     except SQLAlchemyError as e:
@@ -148,18 +149,24 @@ def register_user(data):
             'success': False,
             'message': str(e)
         }), 400
+    
+    try:
+        send_registration_email(new_member)
+    except Exception:
+        pass
 
-    flask_login_user(new_user)
+
+    flask_login_user(new_member)
 
     return jsonify({
         'success': True,
         'message': 'Registration successful',
         'user': {
-            'id': new_user.id,
-            'fname': new_user.fname,
-            'lname': new_user.lname,
-            'email': new_user.email,
-            'age': new_user.age
+            'id': new_member.id,
+            'fname': new_member.fname,
+            'lname': new_member.lname,
+            'email': new_member.email,
+            'age': new_member.age
         }
     }), 201
 	

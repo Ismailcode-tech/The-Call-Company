@@ -2,6 +2,7 @@ from website import db
 from flask_login import UserMixin
 #module used for hashing the passwords in the database
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 
 class NetworkProvider(db.Model):
@@ -78,13 +79,15 @@ class Membership(db.Model):
     spending_cap_active = db.Column(db.Boolean, default=False, nullable=False)
     spending_cap_amount = db.Column(db.Numeric(6, 2), default=None, nullable=True)
     age_restricted = db.Column(db.Boolean, default=False, nullable=False)
-    start_date = db.Column(db.Date, nullable=False)
-    end_date = db.Column(db.Date, nullable=False)
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='active')
 
 
     def __repr__(self):
         return f'<Membership {self.id} - {self.status}>'
+    
+
     
 
 

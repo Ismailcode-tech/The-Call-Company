@@ -1,4 +1,5 @@
-# from flask import Flask
+#from flask import Flask
+#from flask_mail import Mail
 # from flask_sqlalchemy import SQLAlchemy
 # # from flask_login import LoginManager
 # from os import path
@@ -6,7 +7,7 @@
 # import os
 # db = SQLAlchemy()
 # DB_NAME = "database.db"
-
+#mail = Mail()
 
 # def create_app():
 #     app = Flask(__name__)
@@ -23,12 +24,13 @@
     
 #     # app.register_blueprint(views, url_prefix='/')
 #     # app.register_blueprint(auth, url_prefix='/')  
-
+#      mail.init_app(app) 
 
 
 
     
 #     return app
+
 
 
 
