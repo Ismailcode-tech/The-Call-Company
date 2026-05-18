@@ -1,16 +1,17 @@
 from flask import jsonify
-from flask_login import login_user as flask_login_user, logout_user as flask_logout_user
+from flask_login import login_user as flask_login_user
 from cerberus import Validator
 from datetime import date
-from ...models import db
+from sqlalchemy.exc import SQLAlchemyError
+from . import db
 from ..models import Member
 
-# define the schema of the email and password entered by the user
+
 login_schema = {
     'email': {
         'type': 'string',
         'required': True,
-        'regex': '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        'regex': r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     },
     'password': {
         'type': 'string',
@@ -19,29 +20,73 @@ login_schema = {
     }
 }
 
-def login_user(data):
-    # validate input: It checks if the data entered by the user is the correct format before even going to the database
-    v = Validator(login_schema)
-    if not v.validate(data):
-        return jsonify({'success': False, 'message': 'Validation failed', 'errors': v.errors}), 400
 
+register_schema = {
+    'email': {
+        'type': 'string',
+        'required': True,
+        'regex': r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    },
+    'password': {
+        'type': 'string',
+        'required': True,
+        'minlength': 6
+    },
+    'fname': {
+        'type': 'string',
+        'required': True,
+        'minlength': 2
+    },
+    'lname': {
+        'type': 'string',
+        'required': True,
+        'minlength': 2
+    },
+    'phone_number': {
+        'type': 'string',
+        'required': True,
+        'minlength': 10,
+        'maxlength': 15
+    },
+    'date_of_birth': {
+        'type': 'string',
+        'required': True,
+        'regex': r'^\d{4}-\d{2}-\d{2}$'
+    }
+}
+
+
+def login_user(data):
+
+    v = Validator(login_schema)
+
+    if not v.validate(data):
+        return jsonify({
+            'success': False,
+            'message': 'Validation failed',
+            'errors': v.errors
+        }), 400
 
     email = data.get('email')
     password = data.get('password')
 
-    # check if user exists
     member = Member.query.filter_by(email=email).first()
+
     if not member:
-        return jsonify({'success': False, 'message': 'No account found with that email'}), 404
+        return jsonify({
+            'success': False,
+            'message': 'No account found with that email'
+        }), 404
 
-    # check if password is correct
     if not member.check_password(password):
-        return jsonify({'success': False, 'message': 'Incorrect password'}), 401
+        return jsonify({
+            'success': False,
+            'message': 'Incorrect password'
+        }), 401
 
-    #user has successfuly logged in and flask starts a session for them
     flask_login_user(member)
 
-    return jsonify({ #this sends a response to the frontend
+    return jsonify({
         'success': True,
         'message': 'Logged in successfully',
         'user': {
@@ -52,3 +97,78 @@ def login_user(data):
             'age': member.age
         }
     }), 200
+
+
+def register_user(data):
+
+    v = Validator(register_schema)
+
+    if not v.validate(data):
+        return jsonify({'success': False,'message': 'Validation failed','errors': v.errors}), 400
+
+    email = data.get('email')
+
+    member = Member.query.filter_by(email=email).first()
+
+    if member:
+        return jsonify({
+            'success': False,
+            'message': 'You are already a member, try logging in'
+        }), 409
+
+    try:
+
+        born = date.fromisoformat(data.get('date_of_birth'))
+
+        today = date.today()
+
+        age = today.year - born.year - (
+            (today.month, today.day) < (born.month, born.day)
+        )
+
+        new_user = Member(
+            email=email,
+            fname=data.get('fname'),
+            lname=data.get('lname'),
+            phone_number=data.get('phone_number'),
+            date_of_birth=born,
+            age=age
+        )
+
+        new_user.set_password(data.get('password'))
+
+        db.session.add(new_user)
+        db.session.commit()
+
+    except SQLAlchemyError as e:
+
+        db.session.rollback()
+
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 400
+
+    flask_login_user(new_user)
+
+    return jsonify({
+        'success': True,
+        'message': 'Registration successful',
+        'user': {
+            'id': new_user.id,
+            'fname': new_user.fname,
+            'lname': new_user.lname,
+            'email': new_user.email,
+            'age': new_user.age
+        }
+    }), 201
+	
+
+
+          
+
+
+
+
+
+    
