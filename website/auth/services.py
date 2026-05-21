@@ -169,6 +169,10 @@ def register_user(data):
             'age': new_member.age
         }
     }), 201
+
+#next functions to define: verify account + authenticated + refresh tokens
+#create another folder: members: wheree i implement the functions related to users: show profile details+ update users details
+
 	
 
 
