@@ -99,7 +99,7 @@ class Membership(db.Model):
     
 
     class RefreshToken(db.Model):
-	    __tablename__ = "refresh_tokens"
+	__tablename__ = "refresh_tokens"
 
 	id = db.Column(db.BigInteger, primary_key=True)
 	token = db.Column(db.String(200), unique=True, nullable=False)

@@ -33,7 +33,7 @@ def send_registration_email(member):
     MAIL_SUPPRESS_SEND = False
 
 
-
+    
     in the config.py 
     MAIL_SERVER=smtp.gmail.com
     MAIL_PORT=587
@@ -43,6 +43,8 @@ def send_registration_email(member):
     MAIL_PASSWORD password here
     MAIL_DEFAULT_SENDER=abc@gmail.com
     MAIL_DEBUG=False
+
+
     """
 
     
