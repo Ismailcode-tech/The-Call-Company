@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\hp\OneDrive\Documents\The Call Company\app.py", line 1, in <module>
+    from website import create_app
+  File "C:\Users\hp\OneDrive\Documents\The Call Company\website\__init__.py", line 5, in <module>
+    from . import models
+  File "C:\Users\hp\OneDrive\Documents\The Call Company\website\models.py", line 1, in <module>
+    from website import db
+ImportError: cannot import name 'db' from partially initialized module 'website' (most likely due to a circular import) (C:\Users\hp\OneDrive\Documents\The Call Company\website\__init__.py)

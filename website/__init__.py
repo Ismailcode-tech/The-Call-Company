@@ -1,14 +1,22 @@
-from flask import Config, Flask
+
+from flask_cors import CORS
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from os import path
-from . import models
+from config import Config
 
 db = SQLAlchemy()
+
+
 def create_app():
     app = Flask(__name__)
+    CORS(app, origins=["http://localhost:5173"])
+    
     app.config.from_object(Config)
     db.init_app(app)
+
+    from . import models
+
     create_database(app)
 
 
