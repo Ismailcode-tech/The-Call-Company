@@ -1,7 +1,5 @@
-# plan/recommendations.py
-from models import Plan
 
-
+from ..models import Plan
 def normalize(v):
     return float('inf') if v == 'unl' else int(v)
 
@@ -96,20 +94,38 @@ def format_results(filtered):
         else:
             phone_brand = None
 
+        if r.phone_included and (r.unlimited_data or r.data_gb is not None):
+            tier = "All-in"
+        elif r.phone_included:
+            tier = "Just Phone"
+        else:
+            tier = "SIM Only"
+
+
+        if r.unlimited_data:
+            data = -1
+            data_label = "Unlimited"
+        elif r.data_gb is None:
+            data = 0
+            data_label = "No SIM"
+        else:
+            data = float(r.data_gb)
+            data_label = f"{r.data_gb}GB"        
+
         results.append({
 
             "id":               r.id,
             "provider" :        r.provider.name.lower(),
             "name" :            r.name,
-            "tier" :            r.tier,
-            "type" :            "phone" if r.phone_includedd else "sim",
-            "data" :            float(r.data_gb) if not r.unlimited_data else -1,
-            "dataLabel" :       "Unlimited" if r.unlimited_data else f"{r.data_gb}GB",
+            "tier" :            tier,
+            "type" :            "phone" if r.phone_included else "sim",
+            "data" :            data,
+            "dataLabel" :       data_label,
             "callsTexts" :      "unlimited" if r.calls == "unl" else "limited",
             "calls" :           r.calls,
             "texts" :           r.texts,
             "phoneBrand" :      phone_brand,
-            "phoneModel" :      r.phone_includedd,
+            "phoneModel" :      r.phone_included,
             "monthlyPrice" :    float(r.monthly_price),
             "contractMonths" :  24,
             "twoYearCost" :    calculate_two_year_cost(r.monthly_price)

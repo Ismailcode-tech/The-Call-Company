@@ -1,3 +1,5 @@
+from website.models import Plan
+
 from . import plan_bp
 
 from flask import request, jsonify
@@ -16,6 +18,13 @@ def get_plans():
     filtered = get_best_offer(path,brand,data,calls,priority,budget)
     results = format_results(filtered)
     return jsonify(results)
+
+
+
+@plan_bp.route("", methods=["GET"])
+@plan_bp.route("/", methods=["GET"])
+def all_plans():
+    return jsonify(format_results(Plan.query.all()))
 
 
 
