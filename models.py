@@ -31,11 +31,9 @@ class Member(db.Model, UserMixin):
     password_hash = db.Column(db.String(255), nullable=False)
     is_verified = db.Column(db.Boolean, default=False, nullable=False)
     verification_code = db.Column(db.String(200), nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
-	deleted_at = db.Column(db.DateTime, nullable=True)
-	country = db.relationship('Country', backref=db.backref('users', lazy=True))
-	refresh_tokens =  db.relationship('RefreshToken', backref=db.backref('users', lazy=True))
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
+    deleted_at = db.Column(db.DateTime, nullable=True)
+    refresh_tokens =  db.relationship('RefreshToken', backref=db.backref('users', lazy=True))
     
     memberships = db.relationship('Membership', backref='member', lazy=True)
 
