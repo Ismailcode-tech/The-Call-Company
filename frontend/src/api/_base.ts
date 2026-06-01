@@ -16,8 +16,12 @@ export async function apiFetch<T>(
 
   // Send JSON by default, while still allowing each call to override headers.
   const res = await fetch(`${API_BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json", ...(init.headers || {}) },
-    ...init,
+    credentials: "include",
+    headers: { "Content-Type": "application/json",
+      
+      ...(init.headers || {}) },
+      ...init,
+
   });
 
   // Throwing here keeps API failures visible to pages and hooks.

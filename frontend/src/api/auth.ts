@@ -62,7 +62,7 @@ export async function signIn(input: {
 // Sign-in step 2: verify the emailed code, then cache the verified user.
 export async function verify2FA(input: {
   email: string;
-  code: string;
+  otp_code: string;
 }): Promise<User> {
   const user = await apiFetch<User>(
     "/auth/verify-2fa",
@@ -86,3 +86,10 @@ export function getCurrentUser(): User | null {
 export function updateCurrentUser(user: User) {
   writeUser(user);
 }
+
+
+
+
+
+
+// tryRefresh()
