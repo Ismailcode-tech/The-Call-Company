@@ -2,7 +2,7 @@ from flask import jsonify, make_response
 from cerberus import Validator
 from datetime import date, datetime as dt, timedelta
 from sqlalchemy.exc import SQLAlchemyError
-from . import db
+from website import db
 from ..models import Member
 from tokengeneration import otp, jwtEncode, jwtDecode, get_token_from_header
 from emails import send_otp_email
@@ -117,6 +117,12 @@ def login_user(data):
     if not member.is_verified:
         return error({}, 'Please verify your email before logging in', 403)
 
+
+    #Reset the logged out flag on login
+    member.islogged_out = False
+    db.session.commit()
+
+    #generate an access and refresh token for the session
     access_token = jwtEncode(member)
     refresh_token = jwtEncode(member, is_refresh=True)
 
@@ -152,7 +158,7 @@ def register_user(data):
             (today.month, today.day) < (born.month, born.day)
         )
 
-        # generate otp verification code
+        # generate otp verification code of 6 alphanumeric values
         verification_code = otp(6)
 
         new_member = Member(
@@ -181,7 +187,7 @@ def register_user(data):
         pass
 
     return success({
-        'user': {
+        'member': {
             'id': new_member.id,
             'fname': new_member.fname,
             'lname': new_member.lname,
@@ -226,7 +232,7 @@ def verify_account(data):
     return success({
         'access_token': access_token,
         'refresh_token': refresh_token,
-        'user': {
+        'member': {
             'id': member.id,
             'fname': member.fname,
             'lname': member.lname,

@@ -1,21 +1,48 @@
-from . import mail
+from flask import current_app
 from flask_mail import Message
+from website import mail
 
-def send_registration_email(member):
+
+def send_otp_email(member):
+    """Sends an OTP verification code to the member's email."""
     msg = Message(
-        subject='Welcome to The Call',
-        sender='your@gmail.com',
+        subject='Verify your email - The Call',
+        sender=current_app.config['MAIL_DEFAULT_SENDER'],
         recipients=[member.email]
     )
     msg.body = f'''
-    Hi {member.fname} {member.lname},
+Hi {member.fname},
 
-    Welcome to The Call! Your account has been created successfully.
+Your verification code is:
 
-    You can now log in and browse our plans from Fone, Gap, and Flipper.
+{member.otp_code}
 
-    The Call Team
-        '''
+Enter this code on the verification page to activate your account.
+
+The Call Team
+    '''
+    mail.send(msg)
+
+def send_membership_confirmation_email(member, membership):
+    """Sends a confirmation email after signing up to a plan."""
+    msg = Message(
+        subject='Membership Confirmation - The Call',
+        sender=current_app.config['MAIL_DEFAULT_SENDER'],
+        recipients=[member.email]
+    )
+    msg.body = f'''
+Hi {member.fname},
+
+Your membership has been confirmed!
+
+Membership ID: {membership.id}
+Monthly Price: £{membership.monthly_price}
+Start Date: {membership.start_date}
+End Date: {membership.end_date}
+Status: {membership.status}
+
+The Call Team
+    '''
     mail.send(msg)
 
 

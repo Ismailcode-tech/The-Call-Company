@@ -98,7 +98,7 @@ class Membership(db.Model):
         return f'<Membership {self.id} - {self.status}>'
     
 
-    class RefreshToken(db.Model):
+class RefreshToken(db.Model):
 	__tablename__ = "refresh_tokens"
 
 	id = db.Column(db.BigInteger, primary_key=True)
