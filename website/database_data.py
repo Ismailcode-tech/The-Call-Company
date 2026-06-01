@@ -1,6 +1,6 @@
 from website import create_app
 from website import db
-from database.models import NetworkProvider, Plan
+from .models import NetworkProvider, Plan
 
 app = create_app()
 

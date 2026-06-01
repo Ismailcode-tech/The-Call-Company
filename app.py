@@ -1,6 +1,5 @@
-from website.auth import create_app
-from flask_cors import CORS
-#CORS(app)
+from website import create_app
+
 app = create_app()
 
 if __name__ == '__main__':
