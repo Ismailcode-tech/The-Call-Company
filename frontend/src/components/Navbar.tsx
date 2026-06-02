@@ -25,10 +25,23 @@ export function Navbar() {
     setUser(getCurrentUser());
   }, [pathname]);
 
+
   return (
-    <header className="sticky top-0 z-40">
-      <div className="absolute inset-0 -z-10 bg-background/60 backdrop-blur-xl border-b border-white/5" />
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
+
+  <header className="sticky top-0 z-[60] px-4 pt-3 pb-2">
+    <div className="mx-auto max-w-7xl">
+
+      {/* floating pill */}
+      <div
+        className="flex h-14 items-center justify-between rounded-2xl px-5"
+        style={{
+          background: "rgba(10, 10, 25, 0.65)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+        }}
+      >
         <Logo />
 
         {/* Desktop navigation. */}
@@ -119,6 +132,7 @@ export function Navbar() {
           )}
         </div>
 
+
         {/* Mobile menu button */}
         <button
           onClick={() => setMenu((v) => !v)}
@@ -166,6 +180,7 @@ export function Navbar() {
           </div>
         </div>
       )}
-    </header>
+    </div>  
+  </header>
   );
 }

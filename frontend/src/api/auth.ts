@@ -11,27 +11,12 @@ export interface User {
   isUnder18: boolean;
 }
 
-const STORAGE_KEY = "thecall.user";
+
 
 // Read the signed-in user from localStorage.
 // The window check keeps this safe outside the browser.
-function readUser(): User | null {
-  if (typeof window === "undefined") return null;
-
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as User) : null;
-  } catch {
-    return null;
-  }
-}
 
 // Store or clear the current user in localStorage.
-function writeUser(u: User | null) {
-  if (typeof window === "undefined") return;
-  if (u) localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
-  else localStorage.removeItem(STORAGE_KEY);
-}
 
 // Create a new account and immediately cache the returned user locally.
 export async function signUp(input: {

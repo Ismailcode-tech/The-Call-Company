@@ -4,11 +4,11 @@ from . import plan_bp
 
 from flask import request, jsonify
 from .recommendation import format_results, get_best_offer
-
+from .filters import filterPlan
 
 
 @plan_bp.route("/recommend", methods=["GET"])
-def get_plans():
+def get_plan():
     path = request.args.get("path")
     brand = request.args.get("brand")
     data = request.args.get("data")
@@ -19,6 +19,21 @@ def get_plans():
     results = format_results(filtered)
     return jsonify(results)
 
+
+
+@plan_bp.route("/plans", methods=["GET"])
+def get_filtered_plans():
+    providers = request.args.get("providers")
+    type = request.args.get("type")
+    budget = request.args.get("budget")
+    data = request.args.get("data")
+    brand = request.args.get("brand")
+    calls = request.args.get("calls")
+
+    filtered = filterPlan(providers, type, budget, data, brand, calls)
+
+    results = format_results(filtered)
+    return jsonify(results)
 
 
 @plan_bp.route("", methods=["GET"])

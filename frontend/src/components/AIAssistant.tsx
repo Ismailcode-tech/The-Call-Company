@@ -62,8 +62,10 @@ export function AIAssistant(){
             )}
 
             {open && (
-                <div className="fixed bottom-6 right-6 z-50 w-[min(92vw,380px)] animate-fade-up">
-                    <div className="glass-strong  overflow-hidden rounded-3xl shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]">
+                <div className="fixed bottom-6 right-6 z-[100] w-[min(92vw,380px)] animate-fade-up">
+                    <div className="overflow-hidden rounded-3xl shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)]"
+                         style={{background:"rgba(10,10,20,0.95)", backdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.10)"}}
+                    >
                         {/* Assistant header and close control. */}
                         <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-primary/15 to-transparent px-4 py-3">
                             <div className="flex items-center gap-2">
@@ -84,7 +86,9 @@ export function AIAssistant(){
                             </button>
                         </div>
                         {/* Conversation thread. */}
-                        <div ref={scrollRef} className="max-h-[360px] space-y-3 overflow-y-auto p-4">
+                        <div ref={scrollRef} className="max-h-[360px] space-y-3 overflow-y-auto p-4" 
+                             style={{background: "rgba(10,10,20,0.95)"}}>
+                                 
                             {msgs.map((m) => (
                                 <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                                     <div 
