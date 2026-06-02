@@ -5,9 +5,9 @@ import { ArrowLeft, Search } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { AIAssistant } from "../components/AIAssistant";
 import { GradientBg } from "../components/GradientBg";
-import { type Plan, type Provider } from "../api/plans";
+import { getRecommendedPlans, type Plan, type Provider } from "../api/plans";
 import { PlanCard } from "../components/PlanCard";
-import { API_BASE_URL } from "../api/_base";       
+   
 
 
 
@@ -19,6 +19,7 @@ export default function ResultsPage() {
     const [loading, setLoading] = useState(true);
     const [sortBy, setSortBy] = useState<"match" | "price" | "data">("match");
     const [providerFilter, setProviderFilter] = useState<Provider | "all">("all")
+
 
     // Convert the plan finder query params into the recommendation endpoint request.
     useEffect(() => {
@@ -39,12 +40,20 @@ export default function ResultsPage() {
         if(priority) params.set("priority", priority);
         if(budget) params.set("budget", budget);
         
-        
-        fetch(`${API_BASE_URL}/plans/recommend?${params.toString()}`)
-            .then((res) => res.json())
-            .then((data) => setMatches(data))
-            .catch(() => setMatches([]))
-            .finally(() => setLoading(false));
+        setLoading(true)
+        getRecommendedPlans({
+            path: searchParams.get("path") ?? undefined,
+            justPhone: searchParams.get("justPhone") ?? undefined,
+            brand: searchParams.get("brand") ?? undefined,
+            data: searchParams.get("data") ?? undefined,
+            calls: searchParams.get("calls") ?? undefined,
+            priority: searchParams.get("priority") ?? undefined,
+            budget: searchParams.get("budget") ?? undefined,
+        })
+        .then(setMatches)
+        .catch(() => setMatches([]))
+        .finally(() => setLoading(false));
+          
     }, [searchParams]);
 
     // Client-side sort and filter on top of Flask results.

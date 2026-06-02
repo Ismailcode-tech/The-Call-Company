@@ -1,4 +1,4 @@
-export const API_BASE_URL = "http://localhost:5000/api";
+export const API_BASE_URL = "http://localhost:5000/api/";
 export const MOCK_MODE = false;
 
 // Shared fetch wrapper for every backend request.
@@ -18,6 +18,8 @@ export async function apiFetch<T>(
   const res = await fetch(`${API_BASE_URL}${path}`, {
     headers: { "Content-Type": "application/json", ...(init.headers || {}) },
     ...init,
+    body: init.body,
+    credentials: "include", // Send cookies for session auth, if any.
   });
 
   // Throwing here keeps API failures visible to pages and hooks.
