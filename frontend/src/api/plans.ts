@@ -65,3 +65,38 @@ export async function getRecommendedPlans(params:{
   });
   return apiFetch<Plan[]> (`/plans/recommend?${query.toString()}`);
 }
+
+
+export interface PlanFilters {
+  providers?: Provider[];
+  type?: "all" | "sim" | "phone";
+  budget?: number;
+  data?: string[];
+  brand?: "any" | "apple" | "samsung";
+  calls?: "any" | "limited" | "unlimited";
+}
+
+
+
+
+export async function getFilteredPlans(filters:PlanFilters) : Promise<Plan[]> {
+  const params = new URLSearchParams();
+  if(filters.providers && filters.providers.length > 3)
+    params.set("providers", filters.providers.join(","));
+  if(filters.type && filters.type !== "all")
+    params.set("type", filters.type);
+  if(filters.budget && filters.budget < 100)
+    params.set("budget", filters.budget.toString());
+  if(filters.data && filters.data.length > 0)
+    params.set("data", filters.data.join(","));
+  if(filters.brand && filters.brand !== "any")
+    params.set("brand", filters.brand);
+  if(filters.calls && filters.calls !== "any")
+    params.set("calls", filters.calls);
+
+
+  return apiFetch<Plan[]>(`/plans?${params.toString()}`)
+
+
+  
+}

@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { X, SlidersHorizontal, Apple, Smartphone } from "lucide-react";
 import { GradientBg } from "../components/GradientBg";
 import { AIAssistant } from "../components/AIAssistant";
-import {  type Plan, type Provider } from "../api/plans";
+import { getFilteredPlans, type Plan, type Provider, type PlanFilters } from "../api/plans";
 import { PROVIDER_META } from "../lib/providers";
 import { PlanCard } from "../components/PlanCard";
 import { Navbar } from "../components/Navbar";
-import { usePlans } from "../hooks/usePlans";
+
+
 
 const DATA_OPTIONS = [
     {v:"0.5", label:"0.5GB"},
@@ -24,10 +25,15 @@ const DATA_OPTIONS = [
 ];
 
 export default function OffersPage() {
-    const { plans } = usePlans();
+    
     // Provider query param lets provider pages deep-link into pre-filtered offers.
+    
+    
     const [searchParams] = useSearchParams();
+    
     const providerParam = searchParams.get("provider") as Provider | null;
+    const  [plans, setPlans] = useState<Plan[]>([]);
+    const [loading, setLoading] = useState(true)
     const [providers, setProviders] = useState<Provider[]>(
         providerParam ? [providerParam] : ["fone","gap","flipper"],
     );
@@ -37,27 +43,30 @@ export default function OffersPage() {
     const [brand, setBrand] = useState<"any" | "apple" | "samsung">("any");
     const [calls, setCalls] = useState<"any" | "limited" | "unlimited">("any");
     const [showFilters, setShowFilters] = useState(false)
+    useEffect(() => {
+        setLoading(true);
+        getFilteredPlans({
+            providers,
+            type,
+            budget,
+            data,
+            brand,
+            calls,
 
-    // Keep the selected provider in sync if the URL changes.
+        })
+        .then(setPlans)
+        .catch(() => setPlans([]))
+        .finally(() => setLoading(false));
+    },  [providers, type, budget, data, brand, calls]);
+
+
+
     useEffect (() => {
         if(providerParam) setProviders([providerParam]);
 
     }, [providerParam]);
 
-    // Apply all filter controls locally after the full plan list has loaded.
-    const filtered = useMemo(() => {
-        return plans.filter((p) => {
-            if(!providers.includes(p.provider)) return false;
-            if(type !== "all" && p.type !== type) return false;
-            if(p.monthlyPrice > budget) return false;
-            if(data.length > 0 && !data.includes(String(p.data))) return false;
-            if(brand !== "any" && p.phoneBrand !== brand) return false;
-            if(calls !== "any" && p.callsTexts !== calls) return false;
-            return true
-
-        });
-
-    },[providers,type,budget,data,brand,calls]);
+   
 
     // Toggle one provider checkbox without affecting the other active filters.
     const toggleProvider = (p:Provider) =>
@@ -263,7 +272,7 @@ export default function OffersPage() {
                     <div>
                         <div className="mb-4 flex flex-wrap items-center gap-2">
                             <p className="text-sm text-muted-foreground">
-                                <span className="font-semibold text-foreground">{filtered.length}</span>
+                                <span className="font-semibold text-foreground">{plans.length}</span>
                             </p>
                             {activeChips.length > 0 && <span className="f text-muted-foreground">.</span>}
                             {activeChips.map((c) => (
@@ -277,17 +286,27 @@ export default function OffersPage() {
                                 </button>
                             ))}
                         </div>
-                        {filtered.length === 0 ? (
-                            <EmptyState onReset={reset} />
-                        ): (
-                            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                                {filtered.map((p: Plan) => (
-                                    <div key={p.id} className="animate-fade-up">
-                                        <PlanCard plan={p}/>
-                                    </div>
-                                ))}
+                {loading ? (
+                    // skeleton cards while Flask fetches
+                    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div
+                            key={i}
+                            className="h-80 animate-pulse rounded-3xl border border-white/8 bg-white/[0.03]"
+                        />
+                        ))}
+                    </div>
+                    ) : plans.length === 0 ? (
+                        <EmptyState onReset={reset} />
+                    ) : (
+                    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                        {plans.map((p: Plan) => (
+                            <div key={p.id} className="animate-fade-up">
+                                <PlanCard plan={p} />
                             </div>
-                        )}
+                        ))}
+                    </div>
+                )}
                     </div>   
 
                 </div>

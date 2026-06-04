@@ -31,7 +31,8 @@ class Member(db.Model, UserMixin):
     password_hash = db.Column(db.String(255), nullable=False)
     is_verified = db.Column(db.Boolean, default=False, nullable=False)
     verification_code = db.Column(db.String(200), nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
     deleted_at = db.Column(db.DateTime, nullable=True)
     refresh_tokens =  db.relationship('RefreshToken', backref=db.backref('users', lazy=True))
     
@@ -101,7 +102,7 @@ class RefreshToken(db.Model):
 
 	id = db.Column(db.BigInteger, primary_key=True)
 	token = db.Column(db.String(200), unique=True, nullable=False)
-	member_id = db.Column(db.BigInteger, db.ForeignKey(Member.id, onupdate='CASCADE', ondelete='CASCADE'),nullable=False)
+	member_id = db.Column(db.Integer, db.ForeignKey(Member.id, onupdate='CASCADE', ondelete='CASCADE'),nullable=False)
 	expired_at = db.Column(db.DateTime, nullable=False)
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)

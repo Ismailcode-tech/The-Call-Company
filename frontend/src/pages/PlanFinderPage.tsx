@@ -37,7 +37,7 @@ export default function PlanFinderPage() {
         if(final.calls !== undefined) params.set("calls", String(final.calls))
         if(final.priority) params.set("priority", final.priority)
         if(final.budget !== undefined) params.set("budget", String(final.budget))
-        navigate(`/result?${params.toString()}`);
+        navigate(`/results?${params.toString()}`);
     };
 
  

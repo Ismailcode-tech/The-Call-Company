@@ -20,7 +20,7 @@ export default function HomePage() {
   const cheapest = allPlans.length ? Math.min(...allPlans.map((p) => p.monthlyPrice)) : 0;
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden">
+    <div className="relative min-h-screen ">
       <Navbar />
 
       {/* Hero */}

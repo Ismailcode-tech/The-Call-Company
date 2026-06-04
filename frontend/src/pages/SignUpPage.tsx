@@ -55,7 +55,7 @@ export default function SignUpPage() {
     if (s < 2) { setErr("Use a stronger password"); return; }
     setLoading(true);
     try {
-      await signUp({ fname, lname, email, password: pw, phone_number: phone, dateOfBirth: dob });
+      await signUp({ fname, lname, email, password: pw, phone_number: phone, date_of_birth: dob });
       navigate("/verify-2fa", {
         state:{
           email,
