@@ -1,6 +1,6 @@
+// src/api/auth.ts
 import { apiFetch } from "./_base";
 
-// Frontend copy of the user object returned by the Flask auth endpoints.
 export interface User {
   id: string;
   fullName: string;
@@ -11,70 +11,85 @@ export interface User {
   isUnder18: boolean;
 }
 
+const USER_KEY = "thecall.user";
 
+// get user stored in localStorage (not sensitive) 
+// only JWT tokens go in HTTP-only cookies
+function saveUser(user: User) {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
 
-// Read the signed-in user from localStorage.
-// The window check keeps this safe outside the browser.
+function clearUser() {
+  localStorage.removeItem(USER_KEY);
+}
 
-// Store or clear the current user in localStorage.
+export function getCurrentUser(): User | null {
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? (JSON.parse(raw) as User) : null;
+  } catch {
+    return null;
+  }
+}
 
-// Create a new account and immediately cache the returned user locally.
+// sign up
 export async function signUp(input: {
-  fullName: string;
+  fname: string;
+  lname: string;
   email: string;
   password: string;
-  dateOfBirth: string;
+  phone_number: string;
+  date_of_birth: string;
 }): Promise<User> {
   const user = await apiFetch<User>(
     "/auth/signup",
     { method: "POST", body: JSON.stringify(input) },
   );
-  writeUser(user);
+  
+  saveUser(user);
   return user;
 }
 
-// Sign-in step 1: send credentials and let the backend decide whether 2FA is required.
+// sign in step 1 
 export async function signIn(input: {
   emailOrId: string;
   password: string;
-}): Promise<{ requires2FA: boolean; email?: string }> {
-  return apiFetch<{ requires2FA: boolean; email?: string }>(
+}): Promise<{ requires2FA: boolean; email: string }> {
+  return apiFetch<{ requires2FA: boolean; email: string }>(
     "/auth/signin",
     { method: "POST", body: JSON.stringify(input) },
   );
 }
 
-// Sign-in step 2: verify the emailed code, then cache the verified user.
+// sign in step 2 — verify OTP
 export async function verify2FA(input: {
   email: string;
   otp_code: string;
 }): Promise<User> {
   const user = await apiFetch<User>(
-    "/auth/verify-2fa",
+    "/auth/verify",
     { method: "POST", body: JSON.stringify(input) },
   );
-  writeUser(user);
+  // cookies set by Flask
+  // save user info to localStorage
+  saveUser(user);
   return user;
 }
 
-// Local sign-out only clears the browser copy of the current user.
-export async function signOut() {
-  writeUser(null);
+// resend OTP 
+export async function resendOtp(email: string): Promise<void> {
+  return apiFetch<void>(
+    "/auth/resend-otp",
+    { method: "POST", body: JSON.stringify({ email }) },
+  );
 }
 
-// Pages and layouts use this to decide whether to show signed-in navigation.
-export function getCurrentUser(): User | null {
-  return readUser();
+//  sign out 
+export async function signOut(): Promise<void> {
+  try {
+    await apiFetch<void>("/auth/logout", { method: "POST" });
+  } finally {
+    clearUser();                    // ← clear user from localStorage
+    // cookies cleared by Flask response
+  }
 }
-
-// Replace the stored user after an endpoint returns fresher account data.
-export function updateCurrentUser(user: User) {
-  writeUser(user);
-}
-
-
-
-
-
-
-// tryRefresh()

@@ -5,7 +5,7 @@ from . import auth_bp
 
 
 
-@auth_bp.route('signin', methods=['POST'])
+@auth_bp.route('/signin', methods=['POST'])
 def login():
     data = request.get_json()
     return login_user(data)
