@@ -32,7 +32,9 @@ function ageFromDob(dob: string) {
 export default function SignUpPage() {                           
   const navigate = useNavigate();
   // Each input is controlled so validation and submit can read the latest values.
-  const [fullName, setFullName] = useState("");
+  const [fname, setFname] = useState("");
+  const [lname, setLname] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [dob, setDob] = useState("");
   const [pw, setPw] = useState("");
@@ -53,8 +55,14 @@ export default function SignUpPage() {
     if (s < 2) { setErr("Use a stronger password"); return; }
     setLoading(true);
     try {
-      await signUp({ fullName, email, password: pw, dateOfBirth: dob });
-      navigate("/dashboard");                                    
+      await signUp({ fname, lname, email, password: pw, phone_number: phone, dateOfBirth: dob });
+      navigate("/verify-2fa", {
+        state:{
+          email,
+          emailOrId: email, // since we don't have an ID until after sign-up, just reuse the email for the 2FA step
+          password: pw,   // same for password, so the user doesn't have to re-enter it on the 2FA page
+        }
+      });                                    
     } catch {
       setErr("Couldn't create account");
     } finally {
@@ -76,7 +84,8 @@ export default function SignUpPage() {
             </p>
 
             <form onSubmit={submit} className="mt-6 space-y-4">
-              <Field label="Full name" value={fullName} onChange={setFullName} type="text" required />
+              <Field label="First name" value={fname} onChange={setFname} type="text" required />
+              <Field label="Last name" value={lname} onChange={setLname} type="text" required />
               <Field label="Date of birth" value={dob} onChange={setDob} type="date" required />
               {under18 && (
                 <div className="flex items-start gap-2 rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-xs text-amber-300">
@@ -86,6 +95,7 @@ export default function SignUpPage() {
                   </p>
                 </div>
               )}
+              <Field label="Phone number" value={phone} onChange={setPhone} type="text" required />
               <Field label="Email" value={email} onChange={setEmail} type="email" required />
               <div>
                 <Field

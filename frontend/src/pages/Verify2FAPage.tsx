@@ -85,7 +85,7 @@ export default function Verify2FAPage() {
         setLoading(true);
         setErr(null);
         try{
-            await verify2FA({ email, code: fullCode });
+            await verify2FA({ email, otp_code: fullCode });
             navigate("/dashboard");
         } catch {
             setErr("Invalid or expired code. Please try again.")

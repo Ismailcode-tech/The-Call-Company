@@ -1,30 +1,62 @@
 export const API_BASE_URL = "http://localhost:5000/api";
-export const MOCK_MODE = false;
 
-// Shared fetch wrapper for every backend request.
-// The generic <T> lets each API module describe the JSON it expects back.
 export async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
-  fallback?: () => Promise<T> | T,
+
 ): Promise<T> {
-  // Mock mode is useful when a caller passes local fallback data for frontend-only testing.
-  if (MOCK_MODE && fallback) {
-    await new Promise((r) => setTimeout(r, 220));
-    return await fallback();
-  }
-
-  // Send JSON by default, while still allowing each call to override headers.
   const res = await fetch(`${API_BASE_URL}${path}`, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json",
-      
-      ...(init.headers || {}) },
-      ...init,
-
+    credentials: "include",   // sends cookies automatically
+    headers: {
+      "Content-Type": "application/json",
+      ...(init.headers || {})
+    },
+    ...init,
   });
+  // token expired
 
-  // Throwing here keeps API failures visible to pages and hooks.
-  if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
-  return (await res.json()) as T;
+  if(res.status === 401) {
+    // try refresh
+
+    const refreshed = await tryRefresh();
+    if(refreshed) {
+      // retry original request
+      const retry = await fetch(`${API_BASE_URL}${path}`, {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...(init.headers || {}),
+        },
+        ...init,
+
+      });
+      if(!retry.ok) throw new Error(`API ${retry.status}`);
+      const text = await retry.text();
+      return text ? JSON.parse(text) : (undefined as T);
+    }
+    window.location.href = "/signin";
+    throw new Error("Session expired");
+  }
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `API ${res.status}`);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : (undefined as T);
+}
+
+
+
+async function tryRefresh(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+    return res.ok;
+  }catch {
+    return false;
+  }
+  
 }

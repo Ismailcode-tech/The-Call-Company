@@ -11,40 +11,47 @@ export interface User {
   isUnder18: boolean;
 }
 
-const STORAGE_KEY = "thecall.user";
+const USER_KEY = "thecall.user"
 
-// Read the signed-in user from localStorage.
-// The window check keeps this safe outside the browser.
-function readUser(): User | null {
-  if (typeof window === "undefined") return null;
 
+// user stored in localStorage (not sensitive)
+// only JWT tokens go in HTTP-only cookies
+
+function saveUser(user: User) {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+function clearUser() {
+  localStorage.removeItem(USER_KEY);
+}
+
+
+export function getCurrentUser(): User | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(USER_KEY);
     return raw ? (JSON.parse(raw) as User) : null;
   } catch {
     return null;
   }
 }
+// sign up
 
-// Store or clear the current user in localStorage.
-function writeUser(u: User | null) {
-  if (typeof window === "undefined") return;
-  if (u) localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
-  else localStorage.removeItem(STORAGE_KEY);
-}
 
-// Create a new account and immediately cache the returned user locally.
 export async function signUp(input: {
-  fullName: string;
+  fname: string;
+  lname: string;
   email: string;
   password: string;
+  phone_number: string;
   dateOfBirth: string;
 }): Promise<User> {
   const user = await apiFetch<User>(
     "/auth/signup",
     { method: "POST", body: JSON.stringify(input) },
   );
-  writeUser(user);
+  // cookies set by Flask automatically
+  // just save user info to localStorage
+  saveUser(user);
   return user;
 }
 
@@ -52,8 +59,8 @@ export async function signUp(input: {
 export async function signIn(input: {
   emailOrId: string;
   password: string;
-}): Promise<{ requires2FA: boolean; email?: string }> {
-  return apiFetch<{ requires2FA: boolean; email?: string }>(
+}): Promise<{ requires2FA: boolean; email: string }> {
+  return apiFetch<{ requires2FA: boolean; email: string }>(
     "/auth/signin",
     { method: "POST", body: JSON.stringify(input) },
   );
@@ -68,28 +75,27 @@ export async function verify2FA(input: {
     "/auth/verify-2fa",
     { method: "POST", body: JSON.stringify(input) },
   );
-  writeUser(user);
+  saveUser(user);
   return user;
 }
 
-// Local sign-out only clears the browser copy of the current user.
-export async function signOut() {
-  writeUser(null);
+
+// resend OTP
+export async function resendOtp(email:string): Promise<void> {
+  return apiFetch<void>(
+    "/auth/resend-otp",
+    {method: "POST", body: JSON.stringify({email}) },
+  );
 }
+// sign out
 
-// Pages and layouts use this to decide whether to show signed-in navigation.
-export function getCurrentUser(): User | null {
-  return readUser();
+
+export async function signOut(): Promise<void> {
+  try{
+    await apiFetch<void>("/auth/logout", {method: "POST"});
+  } finally {
+    clearUser();   // clear user from localStorage
+
+    // cookies cleared by Flask response
+  }
 }
-
-// Replace the stored user after an endpoint returns fresher account data.
-export function updateCurrentUser(user: User) {
-  writeUser(user);
-}
-
-
-
-
-
-
-// tryRefresh()
