@@ -12,6 +12,8 @@ const links = [
   { to: "/plan-finder", label: "Find My Plan" },
 ] as const;
 
+
+
 export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();                                    
@@ -19,6 +21,14 @@ export function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
+  const displayName = user?.fname || user?.email || "User";
+  const firstName = displayName.split(" ")[0];
+const initials = displayName
+  .split(" ")
+  .map((n) => n[0])
+  .slice(0, 2)
+  .join("")
+  .toUpperCase();
 
   // Refresh user state after route changes so auth buttons update after sign-in/out.
   useEffect(() => {
@@ -76,9 +86,9 @@ export function Navbar() {
                 className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1.5 pl-1.5 pr-3 text-sm transition-colors hover:bg-white/10"
               >
                 <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-primary to-[oklch(0.5_0.2_300)] text-xs font-semibold text-white">
-                  {user.fullName.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                  {initials}
                 </span>
-                <span className="max-w-[120px] truncate">{user.fullName.split(" ")[0]}</span>
+                <span className="max-w-[120px] truncate">{firstName}</span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </button>
               {open && (
@@ -104,6 +114,7 @@ export function Navbar() {
                   <button
                     onClick={() => {
                       signOut();
+                      setUser(null);
                       setOpen(false);
                       navigate("/");                                 
                     }}

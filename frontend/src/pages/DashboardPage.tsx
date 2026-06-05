@@ -46,7 +46,7 @@ return (
                 Dashboard
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-                {user ? `Hi, ${user.fullName.split(" ")[0]}.` : "Welcome."}
+                {user ? `Hi, ${user.fname || "there"}.` : "Welcome."}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">Everything in one quiet place.</p>
         </header>

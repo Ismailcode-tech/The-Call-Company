@@ -5,7 +5,7 @@ import { Navbar } from "../components/Navbar";
 import { AIAssistant } from "../components/AIAssistant";
 import { GradientBg } from "../components/GradientBg";           
 import { signIn } from "../api/auth"; 
-// import { emitWarning } from "process";
+
 
 
 
@@ -15,15 +15,30 @@ export default function SignInPage(){
     const [emailOrId, setEmailOrId] = useState("");
     const [pw, setPw] = useState("");
     const [loading, setLoading] = useState(false);
+    const [err, setErr] = useState<string | null>(null); 
 
     // Submit credentials and move the user forward after a successful sign-in response.
     const submit = async (e:React.FormEvent) =>{
         e.preventDefault();
         setLoading(true);
         try{
-            await signIn({emailOrId, password:pw});
-            navigate("/dashboard");
-        }finally{
+            const result = await signIn({emailOrId, password:pw});
+            // backend returns { requires2FA: true, email: "..." }
+            if(result.requires2FA){
+                    navigate("/verify-2fa", {
+                    state: {
+                    email: result.email,
+                    emailOrId: emailOrId,
+                    password: pw,
+                    }
+                });
+
+            }
+          
+            
+        }catch(err: any){
+            setErr(err.message || "Invalid email or password")
+        } finally{
             setLoading(false);
         }
     };
@@ -59,6 +74,11 @@ export default function SignInPage(){
                                     Forget pasword?
                                 </a>
                             </div>
+                            {err && (
+                                <p className="text-xs text-destructive">{err}</p>
+                            )}
+
+
                             <button 
                             type="submit" 
                             disabled={loading} 

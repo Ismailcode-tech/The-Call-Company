@@ -44,6 +44,8 @@ def format_user_response(member):
         
     return {
         'id': str(member.id),
+        'fname' : member.fname,
+        'lname' : member.lname,
         'email': member.email,
         'dateOfBirth': member.date_of_birth.isoformat() if member.date_of_birth else "",
         'membershipId': membership_id,
@@ -58,13 +60,13 @@ login_schema = {
     #we can log in either using the email or the membership id
     'emailOrId': {
         'type': 'string',
-        'required': False
+        'required': True
     },
-    'email': {
-        'type': 'string',
-        'required': True,
-        'regex': r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-    },
+    # 'email': {
+    #     'type': 'string',
+    #     'required': True,
+    #     'regex': r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    # },
     'password': {
         'type': 'string',
         'required': True,
@@ -265,7 +267,7 @@ def register_user(data):
 
 
 
-def verify(data):
+def verify_account(data):
     #Verifies a member's email using the OTP code
     v = Validator(verify_schema)
     if not v.validate(data):
