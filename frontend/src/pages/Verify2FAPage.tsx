@@ -38,12 +38,13 @@ export default function Verify2FAPage() {
 
     },[]);
 
-    // Accept one digit per box and automatically advance as the user types.
+    // Accept one alphanumeric character per box and automatically advance as the user types.
     const handleChange = (index: number, value: string) => {
-        if(!/^\d*$/.test(value)) return;
+        const normalized = value.toUpperCase();
+        if(!/^[A-Z0-9]*$/.test(normalized)) return;
 
         const newCode = [...code];
-        newCode[index] = value.slice(-1);
+        newCode[index] = normalized.slice(-1);
         setCode(newCode);
         setErr(null);
 
@@ -52,17 +53,21 @@ export default function Verify2FAPage() {
         }
     };
 
-    // Backspace from an empty box moves focus to the previous digit.
+    // Backspace from an empty box moves focus to the previous character.
     const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
         if(e.key === "Backspace" && !code[index] && index > 0 ){
             inputRefs.current[index - 1]?.focus();
         }
     };
 
-    // Paste support lets users paste the whole six-digit code at once.
+    // Paste support lets users paste the whole six-character code at once.
     const handlePaste = (e: React.ClipboardEvent) => {
         e.preventDefault();
-        const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6)
+        const pasted = e.clipboardData
+            .getData("text")
+            .toUpperCase()
+            .replace(/[^A-Z0-9]/g, "")
+            .slice(0, 6);
         const newCode = [...code];
         pasted.split("").forEach((char, i) => {
             newCode[i] = char;
@@ -79,7 +84,7 @@ export default function Verify2FAPage() {
         e.preventDefault();
         const fullCode = code.join("");
         if(fullCode.length < 6) {
-            setErr("Please enter the full 6-digit code");
+            setErr("Please enter the full 6-character code");
             return;
         }
         setLoading(true);
@@ -148,7 +153,7 @@ export default function Verify2FAPage() {
             <Navbar />
             <GradientBg variant="subtle" />
 
-            <section className="relative grid h-14 w-14 place-items-center px-5 py-20">
+            <section className="relative grid place-items-center px-5 py-20">
                 <div className="relative w-full max-w-md">
                     <div className="absolute -inset-8 -z-10 rounded-[40px] bg-primary/20 blur-3xl" />
                     <div className="glass-strong rounded-3xl p-8 shadow-2xl">
@@ -160,7 +165,7 @@ export default function Verify2FAPage() {
                             Check your email
                         </h1>
                         <p className="mt-2 text-center text-sm text-muted-foreground">
-                            We sent a 6-digit code to{" "}
+                            We sent a 6-character code to{" "}
                             <span className="font-medium text-foreground">{email}</span>
                         </p>
                         
@@ -174,7 +179,8 @@ export default function Verify2FAPage() {
                                       key={i}
                                       ref={(el) => {inputRefs.current[i] = el;}}
                                       type="text" 
-                                      inputMode="numeric"
+                                      inputMode="text"
+                                      autoCapitalize="characters"
                                       maxLength={1}
                                       value={digit}
                                       onChange={(e) => handleChange(i, e.target.value)}

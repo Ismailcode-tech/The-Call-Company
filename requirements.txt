@@ -4,7 +4,7 @@ Flask-Login==0.6.3
 PyMySQL==1.1.0
 python-dotenv==1.0.0
 flask-cors==6.0.2
-
+Flask-Mail==0.10.0
 # Frontend note:
 # Node.js must be installed first (recommended: Node 18.x or 20.x).
 # Then install frontend dependencies:

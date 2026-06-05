@@ -3,7 +3,8 @@ import { apiFetch } from "./_base";
 
 export interface User {
   id: string;
-  fullName: string;
+  fname: string;
+  lname: string;
   email: string;
   dateOfBirth: string;
   membershipId: string;
@@ -46,8 +47,11 @@ export async function signUp(input: {
     { method: "POST", body: JSON.stringify(input) },
   );
   
-  saveUser(user);
-  return user;
+  // Ensure fname is present before saving to localStorage
+  const userToSave = { ...user, fname: user.fname || input.fname };
+  saveUser(userToSave);
+  console.log("Saving user:", userToSave);
+  return userToSave;
 }
 
 // sign in step 1 
@@ -67,13 +71,23 @@ export async function verify2FA(input: {
   otp_code: string;
 }): Promise<User> {
   const user = await apiFetch<User>(
-    "/auth/verify",
+    "/auth/verify-2fa",
     { method: "POST", body: JSON.stringify(input) },
   );
   // cookies set by Flask
-  // save user info to localStorage
-  saveUser(user);
-  return user;
+  // save user info to localStorage with validation
+  const validUser = {
+    id: user.id || "",
+    fname: user.fname || "",
+    lname: user.lname || "",
+    email: user.email || input.email,
+    dateOfBirth: user.dateOfBirth || "",
+    membershipId: user.membershipId || "",
+    memberSince: user.memberSince || "",
+    isUnder18: user.isUnder18 ?? false,
+  };
+  saveUser(validUser);
+  return validUser;
 }
 
 // resend OTP 

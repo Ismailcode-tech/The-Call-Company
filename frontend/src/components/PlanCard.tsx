@@ -55,7 +55,7 @@ export function PlanCard({
         <h3 className="text-lg font-semibold tracking-tight">
           {plan.name}
           {plan.phoneModel ? (
-            <span className="ml-1 text-muted-foreground"> Â· {plan.phoneModel}</span>
+            <span className="ml-1 text-muted-foreground"> · {plan.phoneModel}</span>
           ) : null}
         </h3>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground">
