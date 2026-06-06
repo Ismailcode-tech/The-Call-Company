@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { X, SlidersHorizontal, Apple, Smartphone } from "lucide-react";
 import { GradientBg } from "../components/GradientBg";
 import { AIAssistant } from "../components/AIAssistant";
-import { getFilteredPlans, type Plan, type Provider, type PlanFilters } from "../api/plans";
+import { getFilteredPlans, type Plan, type Provider } from "../api/plans";
 import { PROVIDER_META } from "../lib/providers";
 import { PlanCard } from "../components/PlanCard";
 import { Navbar } from "../components/Navbar";
@@ -52,7 +52,6 @@ export default function OffersPage() {
             data,
             brand,
             calls,
-
         })
         .then(setPlans)
         .catch(() => setPlans([]))

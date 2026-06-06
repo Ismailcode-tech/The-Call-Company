@@ -16,7 +16,7 @@ export default function PlanDetailsPage() {
     // The route id chooses one plan from the cached plan list.
     const {planId} = useParams<{planId: string}>();
     const navigate = useNavigate();
-    const plan = allPlans.find((p) => p.id === planId);
+    const plan = allPlans.find((p) => String(p.id) === planId);
     const [agreed, setAgreed] = useState(true);
 
     if(!plan){
