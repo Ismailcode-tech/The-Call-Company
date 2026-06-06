@@ -42,11 +42,7 @@ export async function getPlanById(id:string) : Promise<Plan | undefined > {
   
 }
 
-// Load plans for a single network provider.
-export async function getPlansByProvider(provider:Provider) : Promise<Plan[]> {
-  return apiFetch<Plan[]>(`/plans?provider=${provider}`);
 
-}
 
 // Ask the backend recommendation endpoint for plans that match finder answers.
 export async function getRecommendedPlans(params:{
@@ -81,11 +77,15 @@ export interface PlanFilters {
 
 export async function getFilteredPlans(filters:PlanFilters) : Promise<Plan[]> {
   const params = new URLSearchParams();
-  if(filters.providers && filters.providers.length > 3)
+   console.log("Filters being sent:", filters);
+  
+
+  if (filters.providers && filters.providers.length > 0 && filters.providers.length < 3) {
     params.set("providers", filters.providers.join(","));
+  }
   if(filters.type && filters.type !== "all")
     params.set("type", filters.type);
-  if(filters.budget && filters.budget < 100)
+  if(filters.budget !== undefined)
     params.set("budget", filters.budget.toString());
   if(filters.data && filters.data.length > 0)
     params.set("data", filters.data.join(","));
@@ -94,9 +94,8 @@ export async function getFilteredPlans(filters:PlanFilters) : Promise<Plan[]> {
   if(filters.calls && filters.calls !== "any")
     params.set("calls", filters.calls);
 
+   console.log("URL params:", params.toString());
+
 
   return apiFetch<Plan[]>(`/plans?${params.toString()}`)
-
-
-  
 }

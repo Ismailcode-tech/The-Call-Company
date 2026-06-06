@@ -43,7 +43,7 @@ export default function PortfolioPage() {
                     <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-primary/15 via-white/[0.02] to-transparent p-6">
                         <div className="flex items-center gap-4">
                             <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-primary to-[oklch(0.5_0.2_300)] text-lg font-semibold text-white">
-                                {user ? user.fullName.split(" ").map((n) => n[0]).slice(0, 2).join("") : "—"}
+                                {user ? `${user.fname} ${user.lname}`.split(" ").filter(Boolean).map((n) => n[0]).slice(0, 2).join("").toUpperCase() : "—"}
 
                             </div>
                         </div>

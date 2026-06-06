@@ -79,7 +79,7 @@ export function PlanCard({
             </p>
           </div>
           <Link
-            to={`/plan/${plan.id}`}
+            to={`/plan-details/${plan.id}`}
             className="inline-flex items-center gap-1 rounded-full bg-white/5 px-3 py-2 text-xs font-medium text-foreground transition-all hover:bg-primary hover:text-primary-foreground hover:shadow-[0_8px_30px_-10px_rgba(99,102,241,0.7)]"
           >
             View Plan <ArrowRight className="h-3.5 w-3.5" />
