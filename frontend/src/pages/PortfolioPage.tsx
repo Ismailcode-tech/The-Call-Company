@@ -94,7 +94,7 @@ export default function PortfolioPage() {
                                 <AlertOctagon  className="h-4 w-4"/> Cancel membership
                             </button>
                             <button
-                            onClick={() => {signOut(); navigate("/")}}
+                            onClick={async () => { await signOut(); navigate("/")}}
                             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground hover:bg-white/5"
                             >
                                 Sign out

@@ -10,6 +10,7 @@ import {
 import { Logo } from "./Logo";
 import { signOut } from "../api/auth";
 
+
 // Signed-in dashboard navigation items and their icons.
 const items = [
   { to: "/dashboard",     label: "Dashboard",   icon: LayoutDashboard },
@@ -23,6 +24,7 @@ export function Sidebar() {
   // Current route decides which sidebar item is highlighted.
   const { pathname } = useLocation();
   const navigate = useNavigate();
+
 
   return (
     <aside className="hidden w-64 shrink-0 border-r border-white/5 bg-sidebar/80 backdrop-blur-xl lg:flex lg:flex-col">
@@ -57,8 +59,8 @@ export function Sidebar() {
       </nav>
       <div className="border-t border-white/5 p-3">
         <button
-          onClick={() => {
-            signOut();
+          onClick={async () => {
+            await signOut();
             navigate("/");
           }}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground transition-all hover:bg-destructive/10 hover:text-destructive"
