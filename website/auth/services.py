@@ -239,35 +239,12 @@ def register_user(data):
         send_otp_email(new_member)
     except Exception:
         pass
-
-
-
-
-
-    # Log them in automatically on signup by generating tokens
-    access_token = jwtEncode(new_member, is_refresh=False)
-    refresh_token = jwtEncode(new_member, is_refresh=True)
-    try:
-        expire_delta = current_app.config.get('JWT_REFRESH_TOKEN_EXPIRES', timedelta(days=30))
-        expired_at = dt.utcnow() + expire_delta
-        
-        db_token = RefreshToken(
-            token=refresh_token,
-            member_id=new_member.id,
-            expired_at=expired_at
-        )
-
-        #Add the refresh token to the database 
-        db.session.add(db_token)
-        db.session.commit()
-
-    except SQLAlchemyError:
-        db.session.rollback()
-
-    user_res = format_user_response(new_member)
-    response = make_response(jsonify(user_res), 201)
-    set_auth_cookies(response, access_token, refresh_token)
-    return response
+    
+    return success({
+    'member': {
+        'email': new_member.email
+    }
+}, 'Registration successful, check your email for your OTP verification code', 200)
 
 
 
