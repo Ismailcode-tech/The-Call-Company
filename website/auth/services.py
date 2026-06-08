@@ -30,7 +30,7 @@ def error(data, message: str, code: int):
 
 #the purpose of this function is to format the Member model in the database to match the user interface
 #and display readable values
-def format_user_response(member):
+def format_user_response(member): 
     """Formats a Member object to match the frontend User interface."""
     #formates the created_at timestamp into a human readaable date
     member_since = member.created_at.strftime("%b %Y") if member.created_at else ""
@@ -239,6 +239,10 @@ def register_user(data):
         send_otp_email(new_member)
     except Exception:
         pass
+
+
+
+
 
     # Log them in automatically on signup by generating tokens
     access_token = jwtEncode(new_member, is_refresh=False)

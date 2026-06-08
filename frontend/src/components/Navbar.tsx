@@ -176,6 +176,7 @@ const initials = displayName
                 <button
                   onClick={() => {
                     signOut();
+                    setUser(null);
                     setMenu(false);
                     navigate("/");                                   
                   }}

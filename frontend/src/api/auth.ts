@@ -46,12 +46,8 @@ export async function signUp(input: {
     "/auth/signup",
     { method: "POST", body: JSON.stringify(input) },
   );
-  
-  // Ensure fname is present before saving to localStorage
-  const userToSave = { ...user, fname: user.fname || input.fname };
-  saveUser(userToSave);
-  console.log("Saving user:", userToSave);
-  return userToSave;
+
+  return user;
 }
 
 // sign in step 1 
@@ -87,6 +83,7 @@ export async function verify2FA(input: {
     isUnder18: user.isUnder18 ?? false,
   };
   saveUser(validUser);
+  saveUser(user);
   return validUser;
 }
 
@@ -103,7 +100,7 @@ export async function signOut(): Promise<void> {
   try {
     await apiFetch<void>("/auth/logout", { method: "POST" });
   } finally {
-    clearUser();                    // ← clear user from localStorage
+    clearUser();                    //  clear user from localStorage
     // cookies cleared by Flask response
   }
 }
