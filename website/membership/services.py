@@ -1,7 +1,3 @@
-# generate_membership_id
-# activate_membership
-# get_current_membership
-# get_membership_history
  import datetime
 import random
 import string
@@ -9,8 +5,6 @@ from website import db
 from website.membership.models import Membership
 from website.plan.models import Plan
 from website.auth.models import Member
-
-
 def generate_membership_id():
     random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return 'CALL-2026-' + random_part
@@ -43,5 +37,4 @@ def activate_membership_service(member_id, plan_id):
     )
     db.session.add(new_membership)
     db.session.commit()
-
     return True, membership_id
