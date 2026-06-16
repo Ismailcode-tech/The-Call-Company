@@ -1,29 +1,28 @@
 from . import membership_bp
 from flask import jsonify, request
-
-
-
-@membership_bp.route('/activate', methods=['POST'])
-def activate_membership():
-    data = request.get_json()
-    if not data or 'planId' not in data:
-        return jsonify({"error": "Invalid request data"}), 400
-    # Process activation logic here
-    return jsonify({"message": "Membership activated"}), 200
-
-@membership_bp.route('/cancel', methods=['POST'])
-def cancel_membership():
-    # Process cancellation logic here
-    return jsonify({"message": "Membership cancelled"}), 200
-
-@membership_bp.route('/history', methods=['GET'])
-def membership_history():
-    # Process history retrieval logic here
-    # Return an empty list to match HistoryEntry[] in the frontend
-    return jsonify([]), 200
-
+from flask_login import login_required, current_user
+from website.membership.services import (
+    activate_membership_service,
+    cancel_membership_service,
+    get_current_membership,
+    get_membership_history
+)
 @membership_bp.route('', methods=['GET'])
+@login_required
 def getMembership():
-    # Process membership retrieval logic here
-    # Return None (which becomes JSON null) to indicate no active membership
-    return jsonify(None), 200
+    membership = get_current_membership(current_user.id)
+    return jsonify(membership), 200
+@membership_bp.route('/activate', methods=['POST'])
+@login_required
+def activate_membership():
+    data    = request.get_json()
+    plan_id = data.get('plan_id')
+    if not data or not plan_id:
+        return jsonify({'error': 'plan_id is required'}), 400
+    ok, result = activate_membership_service(current_user.id, plan_id)
+    if not ok:
+        return jsonify({'error': result}), 400
+    return jsonify({
+        'message':       'Membership activated',
+        'membership_id': result
+    }), 200
