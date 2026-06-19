@@ -3,7 +3,6 @@ from flask import jsonify, request
 from flask_login import login_required, current_user
 from website.membership.services import (
     activate_membership_service,
-    cancel_membership_service,
     get_current_membership,
     get_membership_history
 )
