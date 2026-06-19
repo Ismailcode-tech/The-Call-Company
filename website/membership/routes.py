@@ -5,7 +5,6 @@ from website.membership.services import (
     activate_membership_service,
     get_current_membership,
     get_membership_history
-)
 @membership_bp.route('', methods=['GET'])
 @login_required
 def getMembership():
@@ -19,7 +18,7 @@ def activate_membership():
     if not data or not plan_id:
         return jsonify({'error': 'plan_id is required'}), 400
     ok, result = activate_membership_service(current_user.id, plan_id)
-    if not ok:
+    if ok == False:
         return jsonify({'error': result}), 400
     return jsonify({
         'message':       'Membership activated',
