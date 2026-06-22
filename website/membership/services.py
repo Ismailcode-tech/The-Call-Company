@@ -1,7 +1,3 @@
-# generate_membership_id
-# activate_membership
-# get_current_membership
-# get_membership_history
 
 from datetime import datetime, timedelta
 from website.models import Membership, Member, Plan, db
@@ -115,15 +111,7 @@ def get_current_membership(member_id):
             "monthlyPrice": float(plan.monthly_price)
         } if plan else None
     }
-    """
-    return {
-        "membershipId": str(membership.membership_id),
-        "planId" : str(membership.plan_id),
-        "startedAt" : membership.start_date,
-        "renewalDate" : membership.end_date,
-     
-    }
-    """
+ 
 
 def get_membership_history(member_id):
 

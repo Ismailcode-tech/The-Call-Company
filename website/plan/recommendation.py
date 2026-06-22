@@ -146,17 +146,6 @@ def score_plan(plan, user, priority):
 
 
 
-# #  small boosts for generally good plans 
-# def ml_adjust_score(score, plan, user):
-#     boost = 0
-#     if plan.monthly_price is not None and float(plan.monthly_price) < 20:
-#         boost += 0.5
-#     if user["data"] and float(user["data"]) >= 100:
-#         if plan.unlimited_data:
-#             boost += 1.0
-#     # 
-    
-#     return boost + score
 
     
 
