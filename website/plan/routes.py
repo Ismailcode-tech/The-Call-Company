@@ -15,7 +15,8 @@ def get_plan():
     calls = request.args.get("calls")
     priority = request.args.get("priority")
     budget = request.args.get("budget")
-    filtered = get_recommended_plans(path, brand, data, calls, priority, budget)
+    just_phone = request.args.get("justPhone")  == "1"
+    filtered = get_recommended_plans(path, brand, data, calls, priority, budget, just_phone)
     results = format_results(filtered)
     return jsonify(results), 200
 

@@ -4,9 +4,8 @@ import { ArrowLeft,ArrowRight, Apple, Smartphone, Check } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { AIAssistant } from "../components/AIAssistant";
 import { GradientBg } from "../components/GradientBg";
-
-
-
+import { getCurrentUser } from "../api/auth";
+import { Navigate } from "react-router-dom";
 interface Answers {
     path?: "phone" | "sim" | "both";
     justPhone?: boolean;
@@ -19,6 +18,13 @@ interface Answers {
 
 export default function PlanFinderPage() {
     const navigate = useNavigate();
+    const user = getCurrentUser();
+    if(!user) {
+      return <Navigate to="/signin" replace />
+
+    }
+      
+
     // step controls which question is visible; a stores every answer collected so far.
     const [step, setStep] = useState(0);
     const [a, setA] = useState<Answers>({});
@@ -29,8 +35,9 @@ export default function PlanFinderPage() {
     // Serialize answers into the results page query string.
     const finish = (final: Answers) => {
         const params = new URLSearchParams();
-        const resolvedPath = final.path === "both" ? "phone" : final.path;
-        if(resolvedPath) params.set("path", resolvedPath);
+        // const resolvedPath = final.path === "both" ? "phone" : final.path;
+        // if(resolvedPath) params.set("path", resolvedPath);
+        if(final.path) params.set("path", final.path)
         if(final.justPhone) params.set("justPhone", "1");
         if(final.brand && final.brand !== "any") params.set("brand", final.brand)
         if(final.data !== undefined) params.set("data", String(final.data))

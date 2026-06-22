@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ArrowRight, AlertOctagon } from "lucide-react";
-
 import  { DashboardLayout } from "../components/DashboardLayout";    
 import { ProviderBadge } from "../components/ProviderBadge"; 
 import { getMembership, cancelMembership } from "../api/membership"; 
@@ -21,11 +20,11 @@ export default function MyPlanPage() {
     useEffect(() => {
         getMembership().then((m) => {
             if(m) {
-                setPlan(allPlans.find((p) => p.id === m.planId) ?? null);
+                setPlan(allPlans.find((p) => String(p.id) === String(m.planId)) ?? null);
                 setStartedAt(new Date(m.startedAt));
             }
         });
-    }, []);
+    }, [allPlans]);
 
     if(!plan) {
         return (

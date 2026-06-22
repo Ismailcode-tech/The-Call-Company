@@ -5,6 +5,10 @@ PyMySQL==1.1.0
 python-dotenv==1.0.0
 flask-cors==6.0.2
 Flask-Mail==0.10.0
+langchain_groq==26.1.2
+langchain_chroma==26.1.2
+langchain-chroma chromadb==26.1.2
+pip langsmith==26.1.2
 # Frontend note:
 # Node.js must be installed first (recommended: Node 18.x or 20.x).
 # Then install frontend dependencies:

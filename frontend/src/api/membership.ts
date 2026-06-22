@@ -18,13 +18,14 @@ export interface HistoryEntry extends Membership {
 // Create or replace the current membership after a payment succeeds.
 export async function activateMembership(plan: Plan) : Promise<Membership> {
     return apiFetch<Membership>(
-        "membership/activate",
+        "/membership/activate",
         { method: "POST", body: JSON.stringify({ planId: plan.id }) }
     );
 }
 
 // Load the current user's active membership, or null if they have no plan yet.
 export async function getMembership(): Promise<Membership | null> {
+    
     return apiFetch<Membership | null>("/membership");
     
 }

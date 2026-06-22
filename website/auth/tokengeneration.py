@@ -5,20 +5,7 @@ import random
 import string
 from flask import current_app, request
 from datetime import datetime, timedelta
-"""
-since we are using JWT, in the config.py file you should enclude the following:
 
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)    # token expires after 1 hour
-	JWT_REFRESH_TOKEN_EXPIRES = timedelta(days = 30)
-	ALGORITHM = "HS256"
-	
-    in the .env:
-    JWT_SECRET_KEY= random secret key
-
-
-
-"""
 
 # This function creates an access token and stores the data of the user in the payload (the jwt code)
 def jwtEncode(member: Member, is_refresh=False) -> str:
@@ -30,7 +17,8 @@ def jwtEncode(member: Member, is_refresh=False) -> str:
         expire = current_app.config.get('JWT_ACCESS_TOKEN_EXPIRES', timedelta(hours=1))
         
     payload = {
-        'sub': member.id,
+        # before it was  'sub': member.id this unacceptable
+        'sub': str(member.id),
         'type': 'refresh' if is_refresh else 'access',
         'iat': datetime.utcnow(),
         'exp': datetime.utcnow() + expire
@@ -47,17 +35,22 @@ def jwtDecode(token) -> dict:
     algorithm = current_app.config.get('JWT_ALGORITHM', 'HS256')
     
     try:
+        # we need to change it back to be integer
         payload = jwt.decode(token, jwt_secret, algorithms=[algorithm])
-        member = db.session.get(Member, payload.get('sub'))
+        member = db.session.get(Member, int(payload.get('sub')))
         
         if not member:
+            print(f"[DEBUG jwtDecode] Member not found for sub={payload.get('sub')}")
             return None
         
         return payload
     
     except jwt.ExpiredSignatureError:
+        print("[DEBUG jwtDecode] Token EXPIRED")
         return None
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as e:
+        print(f"[DEBUG jwtDecode] InvalidTokenError: {e}")
+        print(f"[DEBUG jwtDecode] Secret used: '{jwt_secret[:5]}...' (len={len(jwt_secret)})")
         return None
     
 
@@ -66,18 +59,20 @@ def otp(total):
     return str(''.join(random.choices(string.ascii_uppercase + string.digits, k=total)))
 
 
+
+
 def set_auth_cookies(response, access_token, refresh_token):
-    #Sets the access and refresh tokens in secure HTTP-only cookies.
+    #Sets the access and refresh tokens in HTTP-only cookies.
     access_expires = current_app.config.get('JWT_ACCESS_TOKEN_EXPIRES', timedelta(hours=1))
     refresh_expires = current_app.config.get('JWT_REFRESH_TOKEN_EXPIRES', timedelta(days=30))
-    
+    # secure, samesite = get_cookie_settings()
+
     response.set_cookie(
         'access_token',
         access_token,
         max_age=int(access_expires.total_seconds()),
-        # Prevents XSS attacks
         httponly=True,
-        secure=True,
+        secure=False,
         samesite='Lax',
         path='/'
     )
@@ -86,13 +81,14 @@ def set_auth_cookies(response, access_token, refresh_token):
         refresh_token,
         max_age=int(refresh_expires.total_seconds()),
         httponly=True,
-        secure=True,
+        secure=False,
         samesite='Lax',
         path='/'
     )
 
 
 def clear_auth_cookies(response):
+    # secure, samesite = get_cookie_settings()
     #Clears both access and refresh token cookies.
     response.set_cookie(
         'access_token',
@@ -100,7 +96,7 @@ def clear_auth_cookies(response):
         max_age=0,
         expires=0,
         httponly=True,
-        secure=True,
+        secure=False,
         samesite='Lax',
         path='/'
     )
@@ -110,7 +106,7 @@ def clear_auth_cookies(response):
         max_age=0,
         expires=0,
         httponly=True,
-        secure=True,
+        secure=False,
         samesite='Lax',
         path='/'
     )
@@ -123,7 +119,6 @@ def token_required(f):
     #Decorator to require a valid access token stored in the request cookies, we place this decorator before every route for extra protection and security
     @wraps(f)
     def decorated(*args, **kwargs):
-        #checks if the access token is valid
         token = request.cookies.get('access_token')
         if not token:
             return jsonify({'success': False, 'message': 'Authentication token is missing'}), 401

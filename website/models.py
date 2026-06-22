@@ -109,6 +109,20 @@ class RefreshToken(db.Model):
     
 
     
+class Payment(db.Model):
+    __tablename__ = 'payments'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    member_id = db.Column(db.Integer, db.ForeignKey('members.id'), nullable=False)
+    plan_id = db.Column(db.Integer, db.ForeignKey('plans.id'), nullable=False)
+    monthly_price = db.Column(db.Numeric(6, 2), nullable=False)
+    is_payment_confirmed = db.Column(db.Boolean, default=False, nullable=False)
+
+
+    def __repr__(self):
+        return f'<Payment {self.id} - confirmed: {self.is_payment_confirmed}>'
+
+
 
 
 """
