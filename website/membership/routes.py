@@ -1,26 +1,67 @@
-from . import membership_bp
+
 from flask import jsonify, request
-from flask_login import login_required, current_user
-from website.membership.services import (
-    activate_membership_service,
-    get_current_membership,
-    get_membership_history
-@membership_bp.route('', methods=['GET'])
+from flask_login import login_required,current_user
+from . import membership_bp
+from .services import activate_membership, get_current_membership,get_membership_history
+
+
+
+@membership_bp.route("/activate", methods=["POST"])
 @login_required
-def getMembership():
-    membership = get_current_membership(current_user.id)
+def activate():
+
+    data = request.get_json()
+    if not data:
+        return jsonify({
+            "error": "Request body required"
+        }), 400
+
+    plan_id = data.get("planId")
+
+    if not plan_id:
+        return jsonify({
+            "error": "planId is required"
+        }), 400
+
+    
+
+    success, result = activate_membership(
+        member_id=current_user.id,
+        plan_id=plan_id
+    )
+
+    if not success:
+        return jsonify({
+            "error": result
+        }), 400
+
+    return jsonify(result), 200
+
+
+@membership_bp.route("/", methods=["GET"])
+@login_required
+def get_membership():
+
+    member_id = current_user.id
+
+    membership = get_current_membership(member_id)
+    print(membership)
+    
+
     return jsonify(membership), 200
-@membership_bp.route('/activate', methods=['POST'])
+    
+    # returns null automatically if membership is None
+
+
+
+
+
+@membership_bp.route("/history", methods=["GET"])
 @login_required
-def activate_membership():
-    data    = request.get_json()
-    plan_id = data.get('plan_id')
-    if not data or not plan_id:
-        return jsonify({'error': 'plan_id is required'}), 400
-    ok, result = activate_membership_service(current_user.id, plan_id)
-    if ok == False:
-        return jsonify({'error': result}), 400
-    return jsonify({
-        'message':       'Membership activated',
-        'membership_id': result
-    }), 200
+def history():
+
+    member_id = current_user.id
+
+    history_data = get_membership_history(member_id)
+
+    return jsonify(history_data), 200

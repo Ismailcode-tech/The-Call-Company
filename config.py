@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY")
@@ -10,6 +11,7 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
     JWT_ALGORITHM = "HS256"
+ 
     
     # Flask-Mail Configurations
 
@@ -28,6 +30,23 @@ class Config:
     # the email address that appears in the "From" field when sending emails
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER")
 
+    # groq Configurations
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
+    os.environ["LANGCHAIN_PROJECT"] = "AI_Assistant"
+
+ 
+
+    CHROMA_API_KEY = os.getenv("CHROMA_API_KEY")
+    CHROMA_TENANT = os.getenv("CHROMA_TENANT")
+    CHROMA_DATABASE = os.getenv("CHROMA_DATABASE")  
+
+
+
+
 
     """
     in the .env
@@ -35,5 +54,4 @@ class Config:
     MAIL_PASSWORD= ejyu ibwb evct iiix
     MAIL_DEFAULT_SENDER= thecallsupport@gmail.com
 
-    
     """

@@ -83,7 +83,7 @@ def filter_plans(providers=None, plan_type=None, budget=None, data=None, brand=N
 
 
 # Transforms the SQLAlchemy Plan objects into a list of dictionaries.
-# This formats the data perfectly for the frontend API response.
+
 def format_results(Plans):
     results = []
     for plan in Plans:

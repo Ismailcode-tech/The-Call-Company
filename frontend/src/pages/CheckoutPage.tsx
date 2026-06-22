@@ -38,7 +38,7 @@ export default function CheckoutPage() {
         if(!plan) return;
         setLoading(true);
         try {
-            await confirmPayment(plan.id);
+            await confirmPayment(String(plan.id),{ cardNumber, expiry, cvv});
             await activateMembership(plan);
             navigate("/confirmation")
         } finally {

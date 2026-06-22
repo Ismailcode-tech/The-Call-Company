@@ -15,8 +15,6 @@ export async function getSelectedPlan(): Promise<Plan | null> {
     if(!id) return null;
     return await getPlanById(id) ?? null;
     
-
-
 }
 
 // Clear the selected plan after checkout or when abandoning the flow.

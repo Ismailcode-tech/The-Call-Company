@@ -1,0 +1,1 @@
+@ai_bp.route("/chat", methods=['POST'])

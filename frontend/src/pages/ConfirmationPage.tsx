@@ -27,7 +27,9 @@ export default function ConfirmationPage() {
     const [user, setUser] =useState<User | null>(null);
     const [plan, setPlan] = useState<Plan | null>(null);
     const [copied, setCopied] = useState(false);
-
+    const displayName = user?.fname || user?.email || "User";
+    
+    
 
     // Load the current membership and find the matching plan for the summary card.
     useEffect(() => {
@@ -89,7 +91,7 @@ export default function ConfirmationPage() {
                         You're on <span className="text-gradient">The Call.</span>
                     </h1>
                     <p className="mt-3 text-muted-foreground">
-                        Welcome aboard{user ? `, ${user.fullName.split(" ")[0]}`: ""}.Your plan is live.
+                        Welcome aboard{user ? `, ${displayName}`: "User"}.Your plan is live.
                     </p>
                     {user && (
                         <div className="mt-8 inline-flex items-center gap-3 rounded-2xl border border-primary/40 bg-primary/10 px-5 py-3 font-mono text-lg shadow-[0_0_60px_-12px_rgba(99,102,241,0.6)]">

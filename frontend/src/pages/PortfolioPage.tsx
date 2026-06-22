@@ -21,12 +21,16 @@ export default function PortfolioPage() {
     // Load all account data needed for the overview and timeline.
     useEffect(() => {
         setUser(getCurrentUser());
-        getMembership().then((m) => {
-            if (m) setPlan(allPlans.find((p) => p.id === m.planId) ?? null);
-
-        });
-        getHistory().then(setHistory);
+        getHistory().then(setHistory)
+        
     },[])
+    useEffect(() => {
+        getMembership().then((m) => {
+            if(m){
+                setPlan(allPlans.find((p) => String(p.id) === String(m.planId)) ?? null);
+            }
+        })
+    }, [allPlans])
     const total2yr = plan ? plan.monthlyPrice * (plan.contractMonths === 1 ? 24 : plan.contractMonths) : 0
     const cap = user?.isUnder18 ? 15 : null;
 

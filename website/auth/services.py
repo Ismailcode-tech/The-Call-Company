@@ -322,8 +322,8 @@ def refresh_token():
             db.session.delete(db_token)
             db.session.commit()
         return error({}, 'Session expired or invalid, please login again', 401)
-
-    member = db.session.get(Member, payload.get('sub'))
+    # member = db.session.get(Member, payload.get('sub')) before and we need to change it back to be integer
+    member = db.session.get(Member, int(payload.get('sub')))
     if not member:
         return error({}, 'Member not found', 404)
 
@@ -333,15 +333,19 @@ def refresh_token():
     user_res = format_user_response(member)
     response = make_response(jsonify(user_res), 200)
     
-    # Update access token cookie
+    secure = current_app.config.get('JWT_COOKIE_SECURE')
+    if secure is None:
+        secure = request.is_secure
+    samesite = current_app.config.get('JWT_COOKIE_SAMESITE', 'None')
+
     access_expires = current_app.config.get('JWT_ACCESS_TOKEN_EXPIRES', timedelta(hours=1))
     response.set_cookie(
         'access_token',
         new_access_token,
         max_age=int(access_expires.total_seconds()),
         httponly=True,
-        secure=True,
-        samesite='Lax',
+        secure=secure,
+        samesite=samesite,
         path='/'
     )
     return response

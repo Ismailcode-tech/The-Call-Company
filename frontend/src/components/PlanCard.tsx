@@ -5,6 +5,17 @@ import { deviceImage } from "../lib/device-images";
 import { ProviderBadge } from "./ProviderBadge";
 import { PROVIDER_META } from "../lib/providers";
 
+function formatCallsTexts(plan: Plan): string {
+  if (plan.callsTexts === "unlimited") return "Unlimited";
+  if (plan.calls && plan.texts && plan.calls === plan.texts) {
+    return `${plan.calls} mins / texts`;
+  }
+  if (plan.calls || plan.texts) {
+    return [plan.calls, plan.texts].filter(Boolean).join(" / ");
+  }
+  return "—";
+}
+
 // Reusable plan preview used by offers, providers, and recommendation results.
 export function PlanCard({
   plan,
@@ -63,8 +74,7 @@ export function PlanCard({
             <Wifi className="h-3.5 w-3.5" /> {plan.dataLabel}
           </span>
           <span className="inline-flex items-center gap-1">
-            <Phone className="h-3.5 w-3.5" />{" "}
-            {plan.callsTexts === "unlimited" ? "Unlimited" : "Limited"}
+            <Phone className="h-3.5 w-3.5" /> {formatCallsTexts(plan)}
           </span>
           <span className="inline-flex items-center gap-1">
             <Calendar className="h-3.5 w-3.5" /> 24 mo

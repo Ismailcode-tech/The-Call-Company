@@ -1,12 +1,12 @@
 // src/api/_base.ts
-export const API_BASE_URL = "http://localhost:5000/api";
+export const API_BASE_URL = "/api";
 
 export async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
-    credentials: "include",          // ← sends cookies automatically
+    credentials: "include",          //  sends cookies automatically
     headers: {
       "Content-Type": "application/json",
       ...(init.headers || {}),
@@ -49,7 +49,7 @@ async function tryRefresh(): Promise<boolean> {
   try {
     const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
       method: "POST",
-      credentials: "include",        // ← refresh cookie sent automatically
+      credentials: "include",        //  refresh cookie sent automatically
       headers: { "Content-Type": "application/json" },
     });
     return res.ok;

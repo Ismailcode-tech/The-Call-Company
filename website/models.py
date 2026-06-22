@@ -124,27 +124,3 @@ class Payment(db.Model):
 
 
 
-
-"""
-Important consideration:
-
-In order to allow the creation of the tables in the database, in the __init__.py file, you should add the following:
-
-    from . import models             this was missing
-
-    create_database(app)             this was missing as well
-
-    return app
-
-def create_database(app):           this ensures that the database is created
-    with app.app_context():
-        db.create_all()
-        print('Created Database!')
-
-"""
-
-#user_id
-#plan_id
-#is_confirmed True or False
-#reference(payement_id)
-#amount
