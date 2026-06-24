@@ -72,6 +72,34 @@ export default function CheckoutPage() {
 
     const total2yr = plan.monthlyPrice * 24;
 
+    if (plan && under18 && plan.monthlyPrice > 15) {
+        return (
+            <div className="relative min-h-screen">
+                <Navbar/>
+                <GradientBg/>
+                <div className="mx-auto max-w-xl px-5 py-32 text-center">
+                    <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-amber-400/15 text-amber-400">
+                        <AlertTriangle className="h-6 w-6" />
+                    </div>
+                    <h1 className="mt-5 text-3xl font-semibold tracking-tight">
+                        Plan not available
+                    </h1>
+                    <p className="mt-3 text-muted-foreground">
+                        This plan costs <strong>£{plan.monthlyPrice}/mo</strong> which
+                        exceeds your <strong>£15/month spending cap</strong> for under-18 members.
+                    </p>
+                    <Link
+                      to="/offers"
+                      className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
+                    >
+                        Browse eligible plans
+                    </Link>
+                </div>
+            </div>
+        );
+
+    }
+
     return (
         <div className="relative min-h-screen">
             <Navbar />
@@ -95,12 +123,7 @@ export default function CheckoutPage() {
                                 Your card  won't be charged — this is a demo payment step.
                             </p>
 
-                            {under18 && (
-                                <div className="mt-4 flex  items-start gap-2 rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-xs text-amber-300">
-                                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                                    <p>You're under 18 — a £15/month soft spending cap will apply to your account.</p>
-                                </div>
-                            )}
+                            
 
                             <form onSubmit={submit} className="mt-6 space-y-4">
                                 {/* Card number */}
@@ -176,6 +199,8 @@ export default function CheckoutPage() {
                                 </p>
                             </form>
                         </div>
+
+
 
                         {/* Plan summary shown beside the payment form. */}
                         <aside className="glass-strong h-fit rounded-3xl p-7">

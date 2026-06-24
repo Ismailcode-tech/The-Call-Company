@@ -7,6 +7,7 @@ import { AIAssistant } from "../components/AIAssistant";
 import { GradientBg } from "../components/GradientBg";
 import { getRecommendedPlans, type Plan, type Provider } from "../api/plans";
 import { PlanCard } from "../components/PlanCard";
+import { getCurrentUser } from "../api/auth";
    
 
 
@@ -40,17 +41,20 @@ export default function ResultsPage() {
         if(priority) params.set("priority", priority);
         if(budget) params.set("budget", budget);
         
-        setLoading(true)
+        setLoading(true);
+        const user = getCurrentUser();
+        const birthYear = user?.dateOfBirth ? String(new Date(user.dateOfBirth).getFullYear()) : undefined;
         getRecommendedPlans({
-            path: searchParams.get("path") ?? undefined,
-            justPhone: searchParams.get("justPhone") ?? undefined,
-            brand: searchParams.get("brand") ?? undefined,
-            data: searchParams.get("data") ?? undefined,
-            calls: searchParams.get("calls") ?? undefined,
-            priority: searchParams.get("priority") ?? undefined,
-            budget: searchParams.get("budget") ?? undefined,
+            path: path ?? undefined,
+            justPhone: justPhone ?? undefined,
+            brand: brand ?? undefined,
+            data: data ?? undefined,
+            calls: calls ?? undefined,
+            priority: priority ?? undefined,
+            budget: budget ?? undefined,
+            birthYear,
         })
-        .then(setMatches)
+        .then((res) => setMatches(res.results))
         .catch(() => setMatches([]))
         .finally(() => setLoading(false));
           
@@ -151,8 +155,8 @@ export default function ResultsPage() {
                             <Empty />
                         ) : (
                             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                                {displayed.map((p:Plan) => (
-                                    <div key={p.id} className="animate-fade-up">
+                                {displayed.map((p:Plan, index) => (
+                                    <div key={p.id ?? `plan-${index}`} className="animate-fade-up">
                                         <PlanCard plan={p} best={best?.id === p.id && sortBy === "match"}/>
                                     </div>
                                 ))}

@@ -54,11 +54,17 @@ export async function signUp(input: {
 export async function signIn(input: {
   emailOrId: string;
   password: string;
-}): Promise<{ requires2FA: boolean; email: string }> {
-  return apiFetch<{ requires2FA: boolean; email: string }>(
+}): Promise<{ requires2FA: boolean; email: string; user?: User }> {
+  const result = await apiFetch<{ requires2FA: boolean; email: string;  user?: User }>(
     "/auth/signin",
     { method: "POST", body: JSON.stringify(input) },
   );
+  if (!result.requires2FA && result.user) {
+    saveUser(result.user);
+  }
+  return result;
+
+
 }
 
 // sign in step 2 — verify OTP
