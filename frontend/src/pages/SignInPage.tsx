@@ -33,6 +33,11 @@ export default function SignInPage(){
                     }
                 });
 
+            
+
+            // If OTP verification is not required, log in directly and go to the dashboard
+            }   else {
+                navigate("/dashboard");
             }
           
             

@@ -88,7 +88,6 @@ def set_auth_cookies(response, access_token, refresh_token):
 
 
 def clear_auth_cookies(response):
-    # secure, samesite = get_cookie_settings()
     #Clears both access and refresh token cookies.
     response.set_cookie(
         'access_token',

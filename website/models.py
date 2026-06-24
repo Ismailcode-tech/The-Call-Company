@@ -77,21 +77,25 @@ class Plan(db.Model):
 
 
 
-class Membership(db.Model):
-    __tablename__ = 'memberships'
+class Member(db.Model, UserMixin):
+    __tablename__ = 'members'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    membership_id = db.Column(db.Integer, nullable = False)
-    member_id = db.Column(db.Integer, db.ForeignKey('members.id'), nullable=False)
-    plan_id = db.Column(db.Integer, db.ForeignKey('plans.id'), nullable=False)
-    monthly_price = db.Column(db.Numeric(6, 2), nullable=False)
-    spending_cap_active = db.Column(db.Boolean, default=False, nullable=False)
-    spending_cap_amount = db.Column(db.Numeric(6, 2), default=None, nullable=True)
-    age_restricted = db.Column(db.Boolean, default=False, nullable=False)
-    start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.String(20), default='active')
-
+    fname = db.Column(db.String(30), nullable=False)
+    lname = db.Column(db.String(30), nullable=False)
+    date_of_birth = db.Column(db.Date, nullable=False)
+    phone_number = db.Column(db.String(15), nullable=False)
+    age = db.Column(db.Integer, nullable=False)
+    email = db.Column(db.String(50), nullable=False, unique=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    is_verified = db.Column(db.Boolean, default=False, nullable=False)
+    verification_code = db.Column(db.String(200), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
+    deleted_at = db.Column(db.DateTime, nullable=True)
+    refresh_tokens =  db.relationship('RefreshToken', backref=db.backref('users', lazy=True))
+    last_otp_at = db.Column(db.DateTime, nullable=True)
+    memberships = db.relationship('Membership', backref='member', lazy=True)
 
     def __repr__(self):
         return f'<Membership {self.id} - {self.status}>'

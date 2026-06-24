@@ -1,10 +1,11 @@
-from website.models import NetworkProvider, Plan
+from website.models import Plan
 
 from . import plan_bp
 
 from flask import request, jsonify
-from .recommendation import format_results, get_recommended_plans
-from .filters import format_results,filter_plans
+from flask_login import current_user
+from .recommendation import format_results as rec_format_results, get_recommended_plans
+from .filters import format_results, filter_plans
 
 
 @plan_bp.route("/recommend", methods=["GET"])
@@ -15,10 +16,22 @@ def get_plan():
     calls = request.args.get("calls")
     priority = request.args.get("priority")
     budget = request.args.get("budget")
-    just_phone = request.args.get("justPhone")  == "1"
-    filtered = get_recommended_plans(path, brand, data, calls, priority, budget, just_phone)
-    results = format_results(filtered)
-    return jsonify(results), 200
+    just_phone = request.args.get("justPhone") == "1"
+    birth_year = request.args.get("birthYear")
+    isUnder18 = False
+    if birth_year:
+        try:
+            from datetime import datetime
+            current_year = datetime.utcnow().year
+            isUnder18 = current_year - int(birth_year) < 18
+        except ValueError:
+            isUnder18 = False
+    elif current_user.is_authenticated:
+        isUnder18 = current_user.age < 18 if current_user.age else False
+
+    filtered = get_recommended_plans(path, brand, data, calls, priority, budget, just_phone, isUnder18)
+    results = rec_format_results(filtered)
+    return jsonify({"results": results, "isUnder18": isUnder18}), 200
 
 
 

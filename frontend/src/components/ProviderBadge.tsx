@@ -10,7 +10,15 @@ export function ProviderBadge({
   size?: "sm" | "md";
 }) {
   // Size only changes padding and text scale; colors always come from PROVIDER_META.
-  const meta = PROVIDER_META[provider];
+  const meta = PROVIDER_META[provider] ?? {
+    name: provider,
+    color: "transparent",
+    dot: "bg-white/10",
+    tagline: "",
+    description: "",
+    accent: "",
+    bgGlow: "",
+  };
   const px = size === "md" ? "px-3 py-1.5 text-xs" : "px-2.5 py-1 text-[11px]";
   return (
     <span

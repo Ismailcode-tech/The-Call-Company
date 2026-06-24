@@ -13,6 +13,13 @@ export type PhoneModel =
   | null;
 
 // Plan is the frontend shape after the backend formats database rows for the UI.
+
+export interface RecommendedPlansResponse {
+  results: Plan[];
+  isUnder18: boolean;
+}
+
+
 export interface Plan  {
   id: string;
   provider: Provider;
@@ -45,6 +52,11 @@ export async function getPlanById(id:string) : Promise<Plan | undefined > {
 
 
 // Ask the backend recommendation endpoint for plans that match finder answers.
+export interface RecommendedPlansResponse {
+  results: Plan[];
+  isUnder18: boolean;
+}
+
 export async function getRecommendedPlans(params:{
   path?:string;
   justPhone?: string;
@@ -53,13 +65,14 @@ export async function getRecommendedPlans(params:{
   calls?: string;
   priority?: string;
   budget?: string;
-}) : Promise<Plan[]> {
+  birthYear?: string;
+}) : Promise<RecommendedPlansResponse> {
   // URLSearchParams avoids hand-building query strings and skips empty answers.
   const query = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {
     if(v !== undefined) query.set(k,v);
   });
-  return apiFetch<Plan[]> (`/plans/recommend?${query.toString()}`);
+  return apiFetch<RecommendedPlansResponse>(`/plans/recommend?${query.toString()}`);
 }
 
 

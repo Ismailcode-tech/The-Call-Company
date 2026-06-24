@@ -27,7 +27,7 @@ export function PlanCard({
   compact?: boolean;
 }) {
   // Provider metadata controls the glow color and badge styling.
-  const meta = PROVIDER_META[plan.provider];
+  const meta = PROVIDER_META[plan.provider] ?? { color: "transparent" };
   return (
     <div
       className={`group relative flex flex-col overflow-hidden rounded-3xl border border-white/8 bg-white/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-white/15 hover:bg-white/[0.06] ${

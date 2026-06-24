@@ -11,8 +11,7 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
     JWT_ALGORITHM = "HS256"
- 
-    
+    OTP_EXPIRATION_DAYS = 7
     # Flask-Mail Configurations
 
     #the mail server used to send emails
@@ -47,11 +46,3 @@ class Config:
 
 
 
-
-    """
-    in the .env
-    MAIL_USERNAME= thecallsupport@gmail.com
-    MAIL_PASSWORD= ejyu ibwb evct iiix
-    MAIL_DEFAULT_SENDER= thecallsupport@gmail.com
-
-    """

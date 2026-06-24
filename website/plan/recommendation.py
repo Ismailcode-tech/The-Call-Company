@@ -1,4 +1,4 @@
-# plan/recommendations.py
+
 from ..models import Plan, NetworkProvider
 from sqlalchemy import or_, and_
 import math
@@ -12,7 +12,7 @@ def calculate_two_year_cost(monthly_price):
 
 
 # light filter — only removes clearly wrong plans 
-def build_base_query(path, budget, just_phone=False):
+def build_base_query(path, budget, just_phone=False, under18 = False):
     query = Plan.query.join(NetworkProvider)
 
     # type filter
@@ -28,19 +28,16 @@ def build_base_query(path, budget, just_phone=False):
     elif path == "sim":
         query = query.filter(Plan.phone_included.is_(None))
 
-    # elif path == "phone":
-    #     # Same as "both" if old URLs still send path=phone
-    #     query = query.filter(
-    #         Plan.phone_included.isnot(None),
-    #         or_(
-    #             Plan.data_gb.is_(None),
-    #             Plan.unlimited_data.is_(True),
-    #         ),
-    #     )
+
     if budget:
         query = query.filter(
             Plan.monthly_price <= float(budget)
         )
+
+    if under18:
+        query = query.filter(Plan.monthly_price <= 15)
+
+
 
 
 
@@ -165,10 +162,11 @@ def get_recommended_plans(
     calls,
     priority,
     budget,
-    just_phone = False
+    just_phone = False,
+    isUnder18 = False
     
 ):
-    query = build_base_query(path, budget, just_phone)
+    query = build_base_query(path, budget, just_phone, isUnder18)
 
    
     plans = query.all()

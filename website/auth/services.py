@@ -163,25 +163,70 @@ def login_user(data):
 
     if not member.check_password(password):
         return error({}, 'Incorrect password', 401)
- 
-    #Here I have implemented a 2 factor authentication on login
-    try:
-        verification_code = otp(6)
-        member.verification_code = verification_code
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        return error({}, str(e), 400)
+     # Determine if 2FA (OTP) is required
+    requires_otp = False
+    if not member.is_verified:
+        requires_otp = True
+    elif not member.last_otp_at:
+        requires_otp = True
+    else:
+        otp_expiration_days = current_app.config.get('OTP_EXPIRATION_DAYS', 7)
+        time_diff = dt.utcnow() - member.last_otp_at
+        if time_diff > timedelta(days=otp_expiration_days):
+            requires_otp = True
     
 
-    try:
-        send_otp_email(member)
-    except Exception:
-        pass
-    return jsonify({
-        'requires2FA': True,
-        'email': member.email
-    }), 200
+
+    if requires_otp: 
+        #Here I have implemented a 2 factor authentication on login
+        try:
+            verification_code = otp(6)
+            member.verification_code = verification_code
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return error({}, str(e), 400)
+        
+
+        try:
+            send_otp_email(member)
+        except Exception:
+            pass
+        return jsonify({
+            'requires2FA': True,
+            'email': member.email
+        }), 200
+    else:
+        # Ignore OTP verification and login directly
+        access_token = jwtEncode(member, is_refresh=False)
+        refresh_token = jwtEncode(member, is_refresh=True)
+
+        try:
+            # Clear any existing tokens for this member and save the new refresh token
+            RefreshToken.query.filter_by(member_id=member.id).delete()
+            
+            expire_delta = current_app.config.get('JWT_REFRESH_TOKEN_EXPIRES', timedelta(days=30))
+            expired_at = dt.utcnow() + expire_delta
+            
+            db_token = RefreshToken(
+                token=refresh_token,
+                member_id=member.id,
+                expired_at=expired_at
+            )
+            db.session.add(db_token)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return error({}, str(e), 400)
+
+        user_res = format_user_response(member)
+        response = make_response(jsonify({
+            'requires2FA': False,
+            'user': user_res
+        }), 200)
+        set_auth_cookies(response, access_token, refresh_token)
+        return response
+
 
 def register_user(data):
     #Registers a new member and sends OTP verification email
