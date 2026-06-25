@@ -316,6 +316,7 @@ def verify_account(data):
         if not member.is_verified:
             member.is_verified = True
         member.verification_code = None      # clear otp after verification
+        # member.last_otp_at = dt.utcnow()
         db.session.commit()
 
     except SQLAlchemyError as e:
