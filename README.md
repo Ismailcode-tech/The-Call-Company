@@ -339,7 +339,7 @@ update them all together and re-verify with:
 
     pip check
 
-Last note: Don't before creating a virtual environment and installing the dependencies to move 
+Last note: Don't forget before creating a virtual environment and installing the dependencies to move 
 to the project folder by using the the 'cd' command.
 
 
