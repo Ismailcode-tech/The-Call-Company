@@ -5,7 +5,7 @@ import { Navbar } from "../components/Navbar";
 import { AIAssistant } from "../components/AIAssistant";
 import { GradientBg } from "../components/GradientBg"; 
 import { getCurrentUser, type User } from "../api/auth";
-import { getMembership } from "../api/membership";    
+import { getMembership, type  Membership } from "../api/membership";    
 import { type Plan } from "../api/plans";
 import { usePlans } from "../hooks/usePlans";
 import { ProviderBadge}  from "../components/ProviderBadge"; 
@@ -13,7 +13,7 @@ import { deviceImage } from "../lib/device-images";
 
 const DOTS = Array.from({ length: 40 }).map((_, i) => ({
     left: `${((i * 37 + 11) % 100)}%`,
-    top: `${((i * 23 + 7) % 60) + 10}`,
+    top: `${((i * 23 + 7) % 60) + 10}%`,
     color: ["#6366F1", "#A78BFA", "#38BDF8", "#F472B6"] [i % 4],
     delay: `${((i * 0.07) % 0.6).toFixed(2)}s`,
     duration: `${3+ (i % 4)}s`,
@@ -28,16 +28,25 @@ export default function ConfirmationPage() {
     const [plan, setPlan] = useState<Plan | null>(null);
     const [copied, setCopied] = useState(false);
     const displayName = user?.fname || user?.email || "User";
+    const [membership, setMembership] = useState<Membership | null>(null);
+
+    useEffect(() => {
+        const CurrentUser = getCurrentUser();
+        setUser(CurrentUser);
+        getMembership().then((m) =>{
+            setMembership(m)
+        });
+    }, []);
     
     
 
     // Load the current membership and find the matching plan for the summary card.
     useEffect(() => {
-        setUser(getCurrentUser());
-        getMembership().then((m) => {
-            if (m) setPlan(allPlans.find((p) => p.id === m.planId) ?? null);
-        });
-    }, []);
+        if (membership && allPlans.length > 0) {
+            const foundPlan = allPlans.find((p) => String(p.id) === String(membership.planId));
+            setPlan(foundPlan ?? null);
+        }
+    }, [membership, allPlans]);
 
 
     const total2yr = plan ? plan.monthlyPrice * 24 : 0
@@ -45,7 +54,7 @@ export default function ConfirmationPage() {
     // Copying the membership id gives the user a quick account reference.
     const copy = () => {
         if(!user) return
-        navigator.clipboard.writeText(`#${user.membershipId}`)
+        navigator.clipboard.writeText(`#${user.membershipId || membership?.membershipId}`)
         setTimeout(() => setCopied(false), 1500)
     };
 
@@ -78,7 +87,7 @@ export default function ConfirmationPage() {
                 
                     0% { transform: translateY(0px) translateX(0px); opacity: 0.4; }
                     50%{ opacity: 0.9; }
-                    100%{ trasform: translateY(-30px) translateX(10px); opacity: 0.4; }                    
+                    100%{ transform: translateY(-30px) translateX(10px); opacity: 0.4; }                    
                 }       
             `}</style>
 
@@ -95,7 +104,7 @@ export default function ConfirmationPage() {
                     </p>
                     {user && (
                         <div className="mt-8 inline-flex items-center gap-3 rounded-2xl border border-primary/40 bg-primary/10 px-5 py-3 font-mono text-lg shadow-[0_0_60px_-12px_rgba(99,102,241,0.6)]">
-                            <span>#{user.membershipId}</span>
+                            <span>#{user.membershipId || membership?.membershipId}</span>
                             <button onClick={copy} className="text-primary hover:opacity-80" aria-label="Copy">
                                 {copied ? <Check className="h-4 w-4"/> : <Copy className="h-4 w-4"/>}
                             </button>

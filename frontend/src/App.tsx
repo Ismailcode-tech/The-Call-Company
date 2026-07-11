@@ -13,9 +13,24 @@ import DashboardPage from './pages/DashboardPage'
 import ConfirmationPage from './pages/ConfirmationPage'
 import CheckoutPage from './pages/CheckoutPage'
 import Verify2FAPage from './pages/Verify2FAPage'
+import VerifyEmailPage from './pages/VerifyEmailPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
+import { Toaster } from 'react-hot-toast';
+
 export default function App() {
   return (
     <BrowserRouter>
+    <Toaster 
+        position="top-right"  
+        toastOptions={{
+          style: {
+            background: "#18181b", 
+            color: "#fff",         
+            border: "1px solid rgba(255, 255, 255, 0.1)", 
+            borderRadius: "12px",   
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/signin" element={<SignInPage />} />
@@ -31,6 +46,9 @@ export default function App() {
         <Route path="/confirmation" element={<ConfirmationPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/verify-2fa" element={<Verify2FAPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/Resetpassword" element={<ResetPasswordPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
       </Routes>
 
     </BrowserRouter>

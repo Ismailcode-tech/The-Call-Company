@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from website.models import Membership, Member, Plan, db
 from sqlalchemy.exc import SQLAlchemyError
 from website.payment.services import get_payment 
+from website.auth.emails import send_membership_confirmation_email
 import random
 
 
@@ -10,7 +11,7 @@ def generate_membership_id():
 
     while True:
         new_id = random.randint(100000, 999999)  # 6-digit number, never starts with 0
-        existing = Membership.query.filter_by(id=new_id).first()
+        existing = Membership.query.filter_by(membership_id=new_id).first()
         if not existing:
             return new_id
 
@@ -70,6 +71,13 @@ def activate_membership(member_id, plan_id, spending_cap_amount=None):
         
         db.session.add(membership)
         db.session.commit()
+
+        # Send confirmation email that contains membership details.
+        try:
+            send_membership_confirmation_email(member, membership)
+        except Exception:
+            pass # Continue even if email sending fails
+
         return True, {
             "membershipId": str(membership.membership_id),
             "planId": str(membership.plan_id),
@@ -91,27 +99,13 @@ def get_current_membership(member_id):
     if not membership:
         return None
         
-    plan = db.session.get(Plan, membership.plan_id)
-
     return {
         "membershipId": str(membership.membership_id),
         "planId": str(membership.plan_id),
-        "monthlyPrice": float(membership.monthly_price),
         "startedAt": membership.start_date.isoformat(),
         "renewalDate": membership.end_date.isoformat(),
-        "planSnapshot": {
-            "id": plan.id,
-            "name": plan.name,
-            "providerId": plan.provider_id,
-            "dataGb": float(plan.data_gb) if plan.data_gb is not None else None,
-            "unlimitedData": plan.unlimited_data,
-            "calls": plan.calls,
-            "texts": plan.texts,
-            "phoneIncluded": plan.phone_included,
-            "monthlyPrice": float(plan.monthly_price)
-        } if plan else None
     }
- 
+
 
 def get_membership_history(member_id):
 
@@ -153,6 +147,4 @@ def get_membership_history(member_id):
             } if plan else None
         })
 
-            
-        
     return history

@@ -1,11 +1,11 @@
 Flask==3.0.0
 Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.3
+Flask-Mail==0.10.0
+Flask-Cors==6.0.2
 PyMySQL==1.1.0
 python-dotenv==1.0.0
-flask-cors==6.0.2
-Flask-Mail==0.10.0
-langchain_groq==26.1.2
-langchain_chroma==26.1.2
-langchain-chroma chromadb==26.1.2
-pip langsmith==26.1.2
+langchain-groq==0.3.8
+langchain-chroma==0.2.5
+chromadb==1.0.20
+langsmith==0.4.32

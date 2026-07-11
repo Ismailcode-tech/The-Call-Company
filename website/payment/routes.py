@@ -20,10 +20,11 @@ def confirm():
             "ok":    False,
             "error": "All fields are required"
         }), 400
+    clean_card_number = card_number.replace(" ", "")
 
     result, error = confirm_payment(
         plan_id     = int(plan_id),
-        card_number = card_number,
+        card_number = clean_card_number,
         expiry      = expiry,
         cvv         = cvv,
     )

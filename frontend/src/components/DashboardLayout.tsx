@@ -1,8 +1,11 @@
 import { Sidebar } from "./Sidebar";
 import { AIAssistant } from "./AIAssistant";
 
+
 // Shared shell for signed-in pages: sidebar navigation, page content, and assistant.
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
+
+
   return (
     <div className="flex min-h-screen w-full">
       <Sidebar />

@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { Copy, Check, ShieldCheck, KeyRound, UserCog, AlertOctagon } from "lucide-react";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { ProviderBadge } from "../components/ProviderBadge";
-import { getCurrentUser, signOut, type User } from "../api/auth";
-import { getMembership, getHistory,cancelMembership, type HistoryEntry} from "../api/membership";
+import { getCurrentUser, signOut, verifyEmail,type User } from "../api/auth";
+import { getMembership, getHistory, type HistoryEntry, type Membership} from "../api/membership";
 import {type Plan } from "../api/plans";
 import { usePlans } from "../hooks/usePlans";
 
@@ -16,7 +16,9 @@ export default function PortfolioPage() {
     const [plan, setPlan] = useState<Plan | null>(null);
     const [history, setHistory] = useState<HistoryEntry[]>([]);
     const [copied, setCopied] = useState(false);
-
+    const [err, setErr] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [membership, setMembership] = useState<Membership | null>(null);
 
     // Load all account data needed for the overview and timeline.
     useEffect(() => {
@@ -26,6 +28,7 @@ export default function PortfolioPage() {
     },[])
     useEffect(() => {
         getMembership().then((m) => {
+            setMembership(m)
             if(m){
                 setPlan(allPlans.find((p) => String(p.id) === String(m.planId)) ?? null);
             }
@@ -33,6 +36,27 @@ export default function PortfolioPage() {
     }, [allPlans])
     const total2yr = plan ? plan.monthlyPrice * (plan.contractMonths === 1 ? 24 : plan.contractMonths) : 0
     const cap = user?.isUnder18 ? 15 : null;
+    const handleVerifyEmail = async () => {
+        const userEmail = user?.email;
+        if (!userEmail) {
+            setErr(" ");
+            return;
+        }
+
+        setLoading(true);
+        setErr(null);
+
+        try {
+        
+        await verifyEmail({ emailOrId: userEmail });
+        alert("the verification email has been sent to your email address. Please check your inbox and follow the instructions to verify your email.");
+        } catch (error) {
+        setErr(" Failed to send verification email. Please try again later.");
+        } finally {
+        setLoading(false);
+        }
+  };
+
 
     return(
         <DashboardLayout>
@@ -55,7 +79,7 @@ export default function PortfolioPage() {
                             <Row 
                             
                             k="Membership"
-                            v={user ? `#${user.membershipId}` :  "—"}
+                            v={user ? `#${user.membershipId ||  membership?.membershipId}` :  "—"}
                             mono
                             action={user ? (
                                 <button
@@ -85,18 +109,13 @@ export default function PortfolioPage() {
                             Account
                         </h3>
                         <div className="mt-4 space-y-1.5">
-                            <Action icon={UserCog} label="Edit profile"/>
-                            <Action icon={KeyRound} label="Change password"/>
-                            <button
-                            onClick={async () => {
-                                if (!confirm("Cancel your membership")) return;
-                                await cancelMembership()
-                                navigate("/dashboard");
-                            }}
-                            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-destructive hover:bg-destructive/10"
-                            >
-                                <AlertOctagon  className="h-4 w-4"/> Cancel membership
-                            </button>
+                            <Action 
+                            icon={KeyRound}
+                            label="Change password" 
+                            onClick={handleVerifyEmail}
+                            disabled={loading}
+                            />
+                            
                             <button
                             onClick={async () => { await signOut(); navigate("/")}}
                             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground hover:bg-white/5"
@@ -203,12 +222,22 @@ function Stat({label,value} : {label:string; value: string}) {
         </div>
     )
 }
-
+interface ActionProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
+  disabled?: boolean;
+}
 // Placeholder account action button.
-function Action({icon:Icon, label} : {icon: typeof KeyRound; label: string}) {
-    return (
-        <button className="flex w-full items-center gap-3 rounded-xl  px-3 py-2.5 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
-            <Icon className="h-4 w-4"/> {label}
-        </button>
-    )
+function Action({ icon: Icon, label, onClick, disabled }: ActionProps) {
+  return (
+    <button 
+      onClick={onClick}
+      disabled={disabled}
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <Icon className="h-4 w-4" /> 
+      <span>{label}</span>
+    </button>
+  );
 }

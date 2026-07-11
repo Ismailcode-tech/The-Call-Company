@@ -102,23 +102,7 @@ export default function MyPlanPage() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Link
-              to="/plan-finder"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-[0_8px_30px_-10px_rgba(99,102,241,0.7)]"
-            >
-              Upgrade Plan <ArrowRight className="h-4 w-4" />
-            </Link>
-            <button
-              onClick={async () => {
-                if (confirm("Cancel your membership? This can't be undone.")) {
-                  await cancelMembership();
-                  navigate("/dashboard");                                
-                }
-              }}
-              className="inline-flex items-center gap-2 rounded-full border border-destructive/30 bg-destructive/10 px-5 py-3 text-sm text-destructive hover:bg-destructive/20"
-            >
-              <AlertOctagon className="h-4 w-4" /> Cancel Membership
-            </button>
+      
           </div>
         </div>
 

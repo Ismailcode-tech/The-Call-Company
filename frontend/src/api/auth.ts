@@ -110,3 +110,35 @@ export async function signOut(): Promise<void> {
     // cookies cleared by Flask response
   }
 }
+
+
+
+export async function verifyEmail(input: { emailOrId: string }): Promise<void> {
+  try {
+    await apiFetch<void>("/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email: input.emailOrId, emailOrId: input.emailOrId }),
+    });
+  } catch (error) {
+    console.error("Error occurred while verifying email:", error);
+    throw error;
+  }
+}
+
+
+export async function ResetPassword(input: { password: string; confirmPassword?: string; resetToken?: string; emailOrId?: string }): Promise<void> {
+  try {
+    await apiFetch<void>("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({
+        password: input.password,
+        confirm_password: input.confirmPassword,
+        reset_token: input.resetToken,
+      }),
+    });
+  } catch (error) {
+    console.error("Error occurred while resetting password:", error);
+    throw error;
+  }
+}
+

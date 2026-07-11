@@ -11,7 +11,7 @@ import { confirmPayment } from "../api/payment";
 import { ProviderBadge } from "../components/ProviderBadge";    
 import { deviceImage } from "../lib/device-images"; 
 import type { Plan } from "../api/plans";  
-
+import toast  from "react-hot-toast";
 
 export default function CheckoutPage() {
 
@@ -40,7 +40,11 @@ export default function CheckoutPage() {
         try {
             await confirmPayment(String(plan.id),{ cardNumber, expiry, cvv});
             await activateMembership(plan);
+            toast.success("Payment successful!");
             navigate("/confirmation")
+        }catch (error: any) {
+            toast.error(error.message || "Invalid card details. Please check your information.");
+
         } finally {
             setLoading(false);
         }
@@ -99,6 +103,22 @@ export default function CheckoutPage() {
         );
 
     }
+    // const submit = async (e:React.FormEvent) => {
+    //     e.preventDefault();
+    //     try {
+    //         setLoading(true);
+    //         await confirmPayment(String(plan.id), { cardNumber, expiry, cvv });
+    //         await activateMembership(plan);
+    //         navigate("/confirmation");
+    //     } catch (error) {
+    //         console.error("Payment or activation failed:", error);
+    //         alert("Payment failed. Please check your card details and try again.");
+    //     } finally {
+    //         setLoading(false);
+
+
+    //     }
+    // }
 
     return (
         <div className="relative min-h-screen">

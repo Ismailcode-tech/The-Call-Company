@@ -101,13 +101,13 @@ return (
         value={plan ? (plan.contractMonths === 1 ? "Rolling" : renewalEnd(plan)) :  "—"}
         />
         <State label="Membership"
-        value={user ? `#${user.membershipId}` : "—"}
+        value={user ? `#${user.membershipId || membership?.membershipId}` : "—"}
         mono
         action={
             user && (
                 <button
                 onClick={() => {
-                    navigator.clipboard.writeText(`#${user.membershipId}`);
+                    navigator.clipboard.writeText(`#${user.membershipId || membership?.membershipId}`);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 1500);
                 }}

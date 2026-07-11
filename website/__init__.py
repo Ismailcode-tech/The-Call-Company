@@ -39,12 +39,7 @@ def create_app():
     app.register_blueprint(ai_bp)
 
 
-
-
     return app
-
-
-
 
 def create_database(app):          
     with app.app_context():
