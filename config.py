@@ -8,8 +8,8 @@ class Config:
     # JWT Configurations
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", SECRET_KEY or "fallback_jwt_secret_key")
     from datetime import timedelta
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=45)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=45)
     JWT_ALGORITHM = "HS256"
     OTP_EXPIRATION_DAYS = 7
     # Flask-Mail Configurations
