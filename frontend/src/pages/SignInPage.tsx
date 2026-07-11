@@ -55,7 +55,7 @@ export default function SignInPage(){
                 <div className="relative w-full max-w-md">
                     <div className="absolute -inset-8 -z-10 rounded-[40px] bg-primary/20 blur-3xl"/>
                     <div className="glass-strong rounded-3xl p-8 shadow-2xl ">
-                        <h1 className="text-3xl font-semibold tracking-tight">Welcom back</h1>
+                        <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
                         <p className="mt-1 text-sm text-muted-foreground"> Sign in to manage your plan.</p>
                         {/* Login form state is controlled by React state above. */}
                         <form action="" onSubmit={submit} className="mt-6 space-y-4">

@@ -30,7 +30,7 @@ def user_requests_all_providers(question: str) -> bool:
     return any(re.search(p, question.lower()) for p in ALL_PROVIDER_PATTERNS)
 
 
-# ── LLM (lazy) ────────────────────────────────────────────
+#  LLM 
 llm = None
 
 def get_llm():
@@ -48,16 +48,16 @@ def get_llm():
     return llm
 
 
-# ── CHANGE 1: PlanFilter — added calls_gte, texts_gte, unlimited_data ──
+
 # Previously missing these fields so calls/texts were never extracted or filtered.
 class PlanFilter(BaseModel):
     provider:       Optional[str]  = None
     price_lte:      Optional[int]  = None
-    data_gb_gte:    Optional[int]  = None   # ← renamed from data_gb for clarity
-    calls_gte:      Optional[int]  = None   # ← NEW
-    texts_gte:      Optional[int]  = None   # ← NEW
+    data_gb_gte:    Optional[int]  = None   
+    calls_gte:      Optional[int]  = None   
+    texts_gte:      Optional[int]  = None   
     has_phone:      Optional[bool] = None
-    unlimited_data: Optional[bool] = None   # ← NEW
+    unlimited_data: Optional[bool] = None 
 
 
 # ── CHANGE 2: extract_filter — updated prompt to extract all new fields ──
@@ -120,7 +120,7 @@ Message: {question}
         return {}
 
 
-# ── Database helpers (unchanged) ──────────────────────────
+# Database helpers 
 def fetch_plans_from_db():
     db_url = os.getenv("SQLALCHEMY_DATABASE_URI")
     if not db_url:
@@ -173,7 +173,7 @@ def get_missing_provider_plans(represented_providers):
     return plans
 
 
-# ── CHANGE 3: build_document — added calls_int and texts_int to metadata ──
+#  build_document — added calls_int and texts_int to metadata 
 # Previously calls and texts were only in page_content as strings like "500 minutes".
 # ChromaDB $gte filtering requires integers in metadata.
 # "unl" → 9999, None → 0, numeric string → int.
@@ -225,7 +225,7 @@ def build_document(records):
     return docs
 
 
-# ── CHANGE 4: build_chroma_filter — new dedicated function ───────────────
+#  build_chroma_filter — new dedicated function
 # Previously filter conditions were built inline in chat() with scattered logic.
 # Multiple conditions were not wrapped in $and so ChromaDB ignored all but one.
 # This function produces correct single-condition or $and multi-condition filters.
@@ -266,7 +266,7 @@ def build_chroma_filter(structured_filter: dict, force_all_providers: bool) -> d
     return {"$and": conditions}
 
 
-# ── CHANGE 5: relaxed_search — new fallback when retrieval returns 0 ─────
+# relaxed_search — new fallback when retrieval returns 0
 # Previously empty results → empty context → LLM hallucinates.
 # This progressively relaxes filters until at least one plan is returned.
 def relaxed_search(vector_store, question: str, filter_dict: dict, k: int) -> list:
@@ -317,7 +317,7 @@ def _remove_keys_from_filter(filter_dict: dict, keys_to_remove: list) -> dict:
     return filter_dict
 
 
-# ── Vector store (lazy) ───────────────────────────────────
+# Vector store 
 vectorestore           = None
 vector_store_init_error = None
 
@@ -370,7 +370,7 @@ def get_vector_store():
     return vectorestore
 
 
-# ── Chat history ──────────────────────────────────────────
+# Chat history
 chat_histories = {}
 
 def get_chat_history(user_id: str) -> InMemoryChatMessageHistory:
@@ -398,7 +398,7 @@ Return ONLY the rewritten question.
     return client.invoke(prompt).content.strip()
 
 
-# ── CHANGE 6: updated prompt — LLM now ranks and explains matched/unmatched ──
+# updated prompt — LLM now ranks and explains matched/unmatched
 ANSWER_PROMPT = ChatPromptTemplate.from_template("""
 You are a helpful assistant for The Call Company, a UK mobile phone plan provider.
 The only providers are: Fone, Gap, and Flipper.
@@ -423,7 +423,7 @@ User question:
 """)
 
 
-# ── CHANGE 7: chat() — wired up all new functions ─────────────────────────
+#chat() wired up all new functions 
 @ai_bp.route("/chat", methods=["POST"])
 @token_required
 def chat():
@@ -505,8 +505,3 @@ def chat():
     history.add_ai_message(response.content)
 
     return jsonify({"response": response.content})
-
-
-
-
-

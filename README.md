@@ -255,7 +255,95 @@ http://localhost:5000
 ```
 
 ---
+## Backend Setup — Important Notes
 
+### Environment variables (.env)
+
+Create a `.env` file in the project root (next to `app.py`) with the following:
+
+    SECRET_KEY=any_random_string_here
+    SQLALCHEMY_DATABASE_URI=mysql+pymysql://YOUR_USERNAME:YOUR_PASSWORD@localhost/the_call_db
+
+    MAIL_USERNAME=thecallsupport@gmail.com
+    MAIL_PASSWORD=ejyu ibwb evct iiix
+    MAIL_DEFAULT_SENDER=thecallsupport@gmail.com
+
+    GROQ_API_KEY=YOUR_API
+    LANGCHAIN_API_KEY=YOUR_API
+    CHROMA_API_KEY=YOUR_API
+    CHROMA_TENANT=YOUR_TENANT
+    CHROMA_DATABASE=YOUR_DATABASE
+
+**Important:** `LANGCHAIN_API_KEY` must have *some* value, even a placeholder like `dummy`,
+or the app will crash on startup with `TypeError: str expected, not NoneType` — even if
+you don't plan to use the AI assistant feature.
+
+
+### Activating the virtual environment
+
+After `python -m venv venv`, you must activate it before installing anything:
+
+- Windows (cmd): `venv\Scripts\activate`
+- Windows (PowerShell): `venv\Scripts\Activate.ps1`
+- macOS/Linux: `source venv/bin/activate`
+
+You'll see `(venv)` at the start of your terminal prompt when it's active.
+
+### Windows: keep the project path short
+
+Some dependencies (`torch`, pulled in by `sentence-transformers`) create very deeply
+nested folders on install. If your project sits in a long path (e.g. inside `Downloads`
+with spaces/parentheses in folder names), installation can fail with:
+
+    OSError: [WinError 206] The filename or extension is too long
+
+Fix1: place the project somewhere shallow, e.g. `C:\dev\thecall`, or enable long path
+support in Windows (`regedit` → `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem`
+→ set `LongPathsEnabled` to `1` → restart).
+
+Fix2: Change the outer and inner folders names to shorter names to resolve the issue.
+
+### Seeding the database with sample plans
+
+After running Flask once (so the tables are created), seed the plan/provider data:
+
+```bash
+python -m website.database_data
+```
+
+Without this step, `/api/plans` will work but return an empty list.
+
+### If you change a database model later
+
+`db.create_all()` only creates tables that don't exist yet — it never updates existing
+ones. If you edit a model and get an error like `Unknown column 'x' in 'field list'`,
+drop that specific table in MySQL Workbench and restart Flask so it's recreated with the
+new schema:
+
+    DROP TABLE table_name;
+
+### AI Assistant first run
+
+The first time you use the AI assistant after installing `sentence-transformers`, it will
+download an embedding model from Hugging Face (a few hundred MB). This is normal and only
+happens once — expect a slow startup the first time, then it's cached and fast after that.
+
+### Dependency versions
+
+This project pins the entire `langchain` family (`langchain`, `langchain-core`,
+`langchain-groq`, `langchain-chroma`, `langchain-huggingface`, `langgraph`) to
+compatible versions in `requirements.txt`. These packages update frequently and
+break compatibility with each other across major versions, so **do not upgrade
+any single langchain-related package individually** — if you need to update one,
+update them all together and re-verify with:
+
+    pip check
+
+Last note: Don't before creating a virtual environment and installing the dependencies to move 
+to the project folder by using the the 'cd' command.
+
+
+---
 ## Frontend Setup
 
 Install dependencies
@@ -277,17 +365,8 @@ The frontend runs on
 
 ```
 http://localhost:5173
-```
 
 
-For using ai assistant 
-you need api key from groq and Chromadb credentials and langchain to see live ai assistant process
-GROQ_API_KEY=YOUR_API_KEY
-CHROMA_API_KEY=YOUR_API_KEY
-CHROMA_TENANT=YOUR_Chroma_TENANT
-CHROMA_DATABASE=YOUR_CHROMA_DATABASE
-LANGCHAIN_API_KEY = YOUR_API_KEY
-all this modification should be preformed in the .env
 
 ---
 
@@ -359,7 +438,7 @@ PUT /api/membership
 
 # Contributors
 
-* Ismail Hadjlarbi – Frontend and Recommandation Engin and Filter Development
+* Ismail Hadjlarbi – Frontend and Recommandation Engine and Filter Development
 * Celia Authentication and Database Development.
 * Nabaa Payment and membership systems Development.
 * Ranya AI Assistant and membership Development.
