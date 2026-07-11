@@ -1,4 +1,3 @@
-// src/pages/SignUpPage.tsx
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";           
 import React, { useState } from "react";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
@@ -35,7 +34,6 @@ export default function ResetPasswordPage() {
       setErr("Missing reset information. Please open the reset link from your email.");
       return;
     }
-    // if (s < 2) { setErr("Use a stronger password"); return; }
     setLoading(true);
     try {
       await ResetPassword({ password: pw, confirmPassword: pw2, resetToken, emailOrId: email });
@@ -49,6 +47,9 @@ export default function ResetPasswordPage() {
         }
       });                                    
     } catch {
+      toast.error("your pasword is weak", {
+                      duration: 6000,
+                  });
       setErr("Couldn't reset password");
     } finally {
       setLoading(false);

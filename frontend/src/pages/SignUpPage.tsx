@@ -1,4 +1,3 @@
-// src/pages/SignUpPage.tsx
 import { Link, useNavigate } from "react-router-dom";           
 import React, { useMemo, useState } from "react";
 import { AlertTriangle, ArrowRight, Eye, EyeOff } from "lucide-react";

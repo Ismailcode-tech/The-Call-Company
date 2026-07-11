@@ -1,4 +1,3 @@
-// src/api/auth.ts
 import { apiFetch } from "./_base";
 
 export interface User {

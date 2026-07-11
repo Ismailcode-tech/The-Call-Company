@@ -1,4 +1,3 @@
-// src/api/_base.ts
 export const API_BASE_URL = "/api";
 
 export async function apiFetch<T>(
